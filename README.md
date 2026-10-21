@@ -1,4 +1,4 @@
-# Lewd Anatomy · SEGA Semantic Guidance
+# Stable Diffusion Lewd Anatomy · SEGA Semantic Guidance
 
 **An 18+ extension for Forge, reForge, and Forge Classic (Neo).**
 
