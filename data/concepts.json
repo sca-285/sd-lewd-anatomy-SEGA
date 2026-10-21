@@ -1,0 +1,3490 @@
+{
+  "_comment": [
+    "Lewd Anatomy concept tables. These texts are encoded into SEGA concept conditionings; they never appear in the prompt.",
+    "Every slider has five steps: -2, -1, 0 (neutral, nothing computed), +1, +2; a one-sided slider (no 'below': Anatomy fix, Wrinkles) has 0, +1, +2. 'below' names -2 and -1, 'levels' names +1 and +2.",
+    "An entry is {\"text\", \"direction\" (toward | away), \"scale\" (relative, default 1), \"warmup\" (optional, 0-1 of the steps)}. A plain string is a 'toward' entry.",
+    "A step v computes at most three concepts: toward the entry of v, away from the entry of the opposite side's first step (-1 for +v, +1 for -v), and on the + side, away from 'cap' unless Allow exaggerated.",
+    "Strength of a step = base_scale * Strength * step_gain[|v|] * role factor * entry scale. step_gain keeps +-2 a steady step up from +-1, not a jump.",
+    "The engine appends each text to the user's prompt and guides against the prompt's own prediction, so the scene and clothes cancel.",
+    "Concept strings are anatomy only: no garment and no whole-person name, because those drag a default outfit.",
+    "Anime tags are checked against the Danbooru tag list shipped with tag-autocomplete (danbooru.csv). No entry may address age.",
+    "taper: each concept's edit fades to 0 over the last share of its window (no abrupt low-noise edits, which smear detail).",
+    "face_every / face_threshold: Protect face recomputes its face mask every N steps; the face is where the probe words' attention is above this share of its peak.",
+    "A step's entry may be a list: several separate concepts on that step (Anatomy fix). A slider with no 'below' names is one-sided: 0, +1, +2.",
+    "A profile with an empty table ({}) has no fitting concept (no Danbooru tag that does not drag clothes or something else in): the slider is off there, with a note.",
+    "clashes: slider pairs that pull one body part opposite ways at these signs; both lose their 'opposite' push and the status line says so.",
+    "phase 'fix' (Anatomy fix): runs from 30 % of the range on, never in the composition-setting first steps; 'area' is the slider's own Concept mask area.",
+    "stale_decay: with Rotate (or more concepts than Max concepts), a concept's kept difference fades by this factor for every step it is reused (it was measured on an earlier latent).",
+    "An entry's 'unless' lists regions: the entry is left out while a slider in one of them is moved (Anatomy fix vs the chest and genital sliders).",
+    "phases: each slider's 'phase' runs in that part of the step range (fractions of start..end): shape early (to 0.8), detail late (from 0.3, on past the end to 1.15), fix (Anatomy fix) 0.3-0.85.",
+    "control: the gain every edit gets in each Control mode; Sliders also turns Perp-Neg off.",
+    "Small parts of the frame (vulva, anus, nipples, genital textures) have their own small mask 'area' 0.1, and Vulva runs as a detail slider: early in the steps their words' attention is spread over the whole image, and an edit there re-coloured hair and moved hands.",
+    "overlap_budget: wherever several sliders edit the same pixels, their summed edit there stays within this many times the strongest single slider at that pixel. 'region' groups sliders: an entry's 'unless', detail_after_shape, wait_for and region_warn.",
+    "Pose tab ('scope': 'global', phase 'pose'): the whole picture, in the first 35 % of the schedule whatever Range start says (composition is set there); no concept mask, no Protect face, never in the hires pass. The + steps push away from the -1 entry, the checkpoint's stock pose / eye-level shot / straight gaze. Pose energy names no standing pose, so a sitting or lying prompt stays sitting or lying.",
+    "keep_face (Pose energy, Camera height): with Protect face on, the slider's edit is zeroed on the face like a body slider's, and the face mask is refreshed every step while it runs. Reduces face changes, cannot stop them.",
+    "nudity_lock: automatic, no slider. When the prompt asks for full nudity (nude, completely nude, naked) and names no partial nudity (topless, shirtless...), no garment and no clothed person, one concept pushes away from clothes (measured from the prompt, its own mask area 0.5). Never in the hires pass or on tiles.",
+    "'face': 'features' (Facial hair, Skin realism, Skin tone, Cum, the marks, Wrinkles): with Protect face on, the edit is zeroed only on the core of the face mask (eyes, eyebrows, nose and lips, above face_core_threshold of the peak), so it can reach jaw, chin, cheeks and upper lip.",
+    "The face probe text is '<prompt>, face, eyes, eyebrows, nose, lips'.",
+    "Warnings: warn_time (expected extra time, 8.0 = +800 %) in the status line and the console; region_warn (this many sliders moved on one region) in the status line; overlap_warn (share of the image where the per-pixel cap cut a multi-slider spot below 60 %) once per pass in the console.",
+    "Overlap merge: before the per-pixel cap, the sliders' edits go through sign election (as TIES merging): on each latent value the minority's opposite push is dropped instead of cancelling, so agreeing sliders keep more of the budget.",
+    "fuse: sliders of one part (breasts, nipples, penis, vulva, testicles) moved together become one concept per role, within one phase (Penis + Erection apart from Veins + Wetness + Foreskin; Testicles apart from Scrotum), their texts joined ('large areolae, erect nipples, brown nipples'), at the strongest member's scale. detail_after_shape: in a region where a shape concept runs, detail concepts start at this share of the range.",
+    "edit_cap: at every pixel the summed slider edit stays within this many times the prompt's own CFG push there (smoothed, floor = a quarter of its mean). Needs CFG > 1. 0 = off.",
+    "mask_words: the words of a concept its mask is read from (pubic, armpit, chest, arm, leg...). CLIP ties a bare 'hair' to the hair on the head: read from every token, the Hair tab's masks took in the head and face. Hair concepts name where the hair is and avoid generic 'detailed hair'.",
+    "wait_for: regions (or '*' = any) whose running shape concepts make this detail slider start at detail_after_shape too. shape_after_pose: while a Pose slider runs, shape sliders start at this share of the Pose window.",
+    "Marks (Scars, Moles, Birthmarks, Freckles; Hair & marks tab): detail, body-wide masks read from their own nouns, Protect face keeps only the face core. The prompt says where (scar on chest, mole under eye).",
+    "Wrinkles: one-sided (0, +1 fine lines, +2 deep), a skin detail like the marks. No minus side: smoothing wrinkles away is pulling toward a younger look; Skin realism already covers airbrushed skin. Age itself is the prompt's.",
+    "Caps: a slider's cap is dropped while another moved slider pushes toward one of its tags (Hips + capped away from 'huge ass' while Butt + asks for it).",
+    "Merge: identical concepts of one phase from two sliders are computed once, at the stronger scale (Breasts -2 and Pectorals -2: one 'flat chest').",
+    "Stretch marks (Hair & marks) and Cellulite (Skin): skin details like the marks, masks read from their own nouns, never on the face. Cellulite is off in Anime (no usable tag); Danbooru's stretch_marks tag is rare, so Anime is weak there.",
+    "'ref': true on a step (-1 sparse chest hair, -1 lightly toned body, -1 half-erect): that step is only where the push is measured from, never pushed toward. The minus side then only takes away: a hairless chest stays hairless at -1, a hairy one gets less hair. The opposite push carries the edit, at toward strength.",
+    "Pose style (Pose tab): -2 powerful, -1 confident, +1 graceful, +2 sensual; the character's bearing, for anyone (the prompt says who). Pose energy is how much motion. Pose energy - with Pose style is a clash (arms at sides vs crossed arms / hand on hip), softened.",
+    "by_scene (Pose style): the slider's profile tables have 'women', 'men' and 'any' (no gender, or both: then it is off as mixed_scene says); futa read as women, cuntboys as men. 'variants' in an entry: each image of the batch takes one, by its seed (the same seed always the same pose).",
+    "Genitals as shape + detail: Penis size and Penis girth (shape, fused with Erection), Veins / Wetness / Foreskin (detail); Testicles (shape), Scrotum tight <-> hanging (detail, waits for the testicles); Labia, Vulva puffiness, Vulva texture (detail, small masks, fused). anime tags thick penis / puffy pussy are e621's (Pony), not Danbooru's.",
+    "No fluid in a shape step: precum is Penis wetness's (detail), never Erection's; a shape concept naming a fluid would draw it in the first, composition-setting steps and fight Penis wetness.",
+    "Above Max concepts, detail sliders first lose their caps, then their counter-pushes, before anything takes turns ('• N detail caps / counter-pushes left out'). 'spots' (scars, moles, birthmarks, freckles, stretch marks) do not count toward region_warn: they dot the skin, they do not pile up on one spot."
+  ],
+  "base_scale": 5.0,
+  "step_gain": {
+    "1": 0.6,
+    "2": 1.2
+  },
+  "roles": {
+    "toward": 1.0,
+    "away": 1.0,
+    "opposite": 0.7,
+    "cap": 0.6
+  },
+  "phases": {
+    "shape": [
+      0.0,
+      0.8
+    ],
+    "detail": [
+      0.3,
+      1.15
+    ],
+    "fix": [
+      0.3,
+      0.85
+    ],
+    "pose": [
+      0.0,
+      0.35
+    ],
+    "detail_after_shape": 0.6,
+    "shape_after_pose": 0.7
+  },
+  "profiles": {
+    "realistic": {
+      "label": "Realistic"
+    },
+    "anime": {
+      "label": "Anime"
+    },
+    "stylized": {
+      "label": "Stylized",
+      "fallback": "realistic"
+    }
+  },
+  "profile_aliases": {
+    "pony": "anime"
+  },
+  "auto_profile": [
+    {
+      "pattern": "realis|photo|(?<![a-z])real(?![a-z])|(?<![a-z])raw(?![a-z])",
+      "profile": "realistic"
+    },
+    {
+      "pattern": "pony|illustrious|noob|animagine",
+      "profile": "anime"
+    },
+    {
+      "pattern": "2\\.?5d|semi|styli[sz]ed|3d|toon|cartoon|disney|pixar|render|cgi",
+      "profile": "stylized"
+    },
+    {
+      "pattern": "anime|hentai",
+      "profile": "anime"
+    }
+  ],
+  "scene_tokens": {
+    "women": "\\b(\\d+\\s*girls?|girls?|wom[ae]n|females?|lad(y|ies)|multiple girls|yuri)\\b",
+    "men": "\\b(\\d+\\s*boys?|boys?|m[ae]n|males?|guys?|multiple boys|yaoi)\\b",
+    "futa": "\\b(futa|futanari|shemale|dickgirl|newhalf|hermaphrodite)\\b",
+    "cuntboy": "\\b(cuntboy|cunt boy|cuntboys|vulva boy)\\b"
+  },
+  "sliders": [
+    {
+      "key": "breasts",
+      "label": "Breasts",
+      "phase": "shape",
+      "below": [
+        "flat",
+        "small"
+      ],
+      "levels": [
+        "full",
+        "large"
+      ],
+      "who": "Women",
+      "concepts": {
+        "anime": {
+          "flat": "flat chest",
+          "small": "small breasts",
+          "full": "large breasts",
+          "large": "huge breasts",
+          "cap": {
+            "text": "gigantic breasts",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "flat": "flat chest",
+          "small": "small natural breasts",
+          "full": "large natural breasts",
+          "large": "very large natural breasts, heavy breasts",
+          "cap": {
+            "text": "gigantic breasts, breast implants",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "flat": "flat chest",
+          "small": "small breasts",
+          "full": "large breasts",
+          "large": "very large breasts",
+          "cap": {
+            "text": "gigantic breasts",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "chest",
+      "fuse": "breasts",
+      "mask_words": [
+        "breasts",
+        "breast",
+        "chest"
+      ]
+    },
+    {
+      "key": "penis",
+      "label": "Penis size",
+      "phase": "shape",
+      "below": [
+        "tiny",
+        "small"
+      ],
+      "levels": [
+        "large",
+        "hung"
+      ],
+      "who": "Men",
+      "concepts": {
+        "anime": {
+          "tiny": {
+            "text": "small penis",
+            "scale": 1.3
+          },
+          "small": {
+            "text": "small penis",
+            "scale": 0.6
+          },
+          "large": "large penis",
+          "hung": "huge penis",
+          "cap": {
+            "text": "gigantic penis",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "tiny": "tiny penis",
+          "small": "small penis",
+          "large": "large penis",
+          "hung": "huge penis, very long penis",
+          "cap": {
+            "text": "gigantic penis, oversized penis",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "tiny": "tiny penis",
+          "small": "small penis",
+          "large": "large penis",
+          "hung": "huge penis",
+          "cap": {
+            "text": "gigantic penis",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "penis",
+      "fuse": "penis",
+      "mask_words": [
+        "penis"
+      ]
+    },
+    {
+      "key": "penis-girth",
+      "label": "Penis girth",
+      "phase": "shape",
+      "below": [
+        "thin",
+        "slim"
+      ],
+      "levels": [
+        "thick",
+        "very thick"
+      ],
+      "who": "Men",
+      "region": "penis",
+      "fuse": "penis",
+      "mask_words": [
+        "penis",
+        "shaft"
+      ],
+      "concepts": {
+        "anime": {
+          "thin": {
+            "text": "thick penis",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "slim": {
+            "text": "thick penis",
+            "direction": "away",
+            "scale": 0.7
+          },
+          "thick": "thick penis",
+          "very thick": {
+            "text": "thick penis",
+            "scale": 1.4
+          }
+        },
+        "realistic": {
+          "thin": "thin narrow penis",
+          "slim": {
+            "text": "slightly slim penis",
+            "ref": true
+          },
+          "thick": "thick penis, wide shaft",
+          "very thick": "very thick girthy penis, wide shaft",
+          "cap": {
+            "text": "extremely thick oversized penis shaft",
+            "direction": "away",
+            "scale": 1.0
+          }
+        },
+        "stylized": {
+          "thin": "thin penis",
+          "slim": {
+            "text": "slightly slim penis",
+            "ref": true
+          },
+          "thick": "thick penis",
+          "very thick": "very thick girthy penis",
+          "cap": {
+            "text": "extremely thick penis",
+            "direction": "away",
+            "scale": 1.0
+          }
+        }
+      }
+    },
+    {
+      "key": "testicles",
+      "label": "Testicles",
+      "phase": "shape",
+      "below": [
+        "tiny",
+        "small"
+      ],
+      "levels": [
+        "large",
+        "huge"
+      ],
+      "who": "Men",
+      "concepts": {
+        "anime": {
+          "tiny": {
+            "text": "small testicles",
+            "scale": 1.3
+          },
+          "small": {
+            "text": "small testicles",
+            "scale": 0.6
+          },
+          "large": "large testicles",
+          "huge": "huge testicles",
+          "cap": {
+            "text": "gigantic testicles",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "tiny": "tiny testicles",
+          "small": "small testicles",
+          "large": "large testicles",
+          "huge": "huge testicles, heavy testicles",
+          "cap": {
+            "text": "gigantic testicles",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "tiny": "tiny testicles",
+          "small": "small testicles",
+          "large": "large testicles",
+          "huge": "huge testicles",
+          "cap": {
+            "text": "gigantic testicles",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "testicles",
+      "fuse": "testicles",
+      "mask_words": [
+        "testicles"
+      ]
+    },
+    {
+      "key": "vulva",
+      "label": "Labia",
+      "phase": "detail",
+      "below": [
+        "closed",
+        "small"
+      ],
+      "levels": [
+        "prominent",
+        "pronounced"
+      ],
+      "who": "Women",
+      "concepts": {
+        "anime": {
+          "closed": {
+            "text": "cleft of venus",
+            "scale": 1.3
+          },
+          "small": "cleft of venus",
+          "prominent": "long labia",
+          "pronounced": {
+            "text": "long labia",
+            "scale": 1.2
+          },
+          "cap": {
+            "text": "large clitoris",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "closed": "closed labia",
+          "small": "small labia",
+          "prominent": "visible labia",
+          "pronounced": "very long labia, prominent vulva",
+          "cap": {
+            "text": "oversized clitoris, exaggerated genitals",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "closed": "closed slit, small labia",
+          "small": "small labia",
+          "prominent": "visible labia",
+          "pronounced": "long labia",
+          "cap": {
+            "text": "oversized clitoris",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "vulva",
+      "area": 0.1,
+      "fuse": "vulva",
+      "mask_words": [
+        "labia",
+        "vulva",
+        "clitoris",
+        "venus",
+        "slit"
+      ]
+    },
+    {
+      "key": "vulva-puffy",
+      "label": "Vulva puffiness",
+      "phase": "detail",
+      "below": [
+        "flat",
+        "slim"
+      ],
+      "levels": [
+        "puffy",
+        "very puffy"
+      ],
+      "who": "Women",
+      "region": "vulva",
+      "area": 0.1,
+      "fuse": "vulva",
+      "mask_words": [
+        "vulva",
+        "pussy",
+        "labia",
+        "mons"
+      ],
+      "concepts": {
+        "anime": {
+          "flat": {
+            "text": "puffy pussy",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "slim": {
+            "text": "puffy pussy",
+            "direction": "away",
+            "scale": 0.7
+          },
+          "puffy": "puffy pussy",
+          "very puffy": {
+            "text": "puffy pussy",
+            "scale": 1.4
+          }
+        },
+        "realistic": {
+          "flat": "flat vulva, flat mons pubis",
+          "slim": {
+            "text": "slightly flat vulva",
+            "ref": true
+          },
+          "puffy": "puffy vulva, plump outer labia",
+          "very puffy": "very puffy vulva, plump mons pubis, full outer labia",
+          "cap": {
+            "text": "grotesquely swollen vulva",
+            "direction": "away",
+            "scale": 1.0
+          }
+        },
+        "stylized": {
+          "flat": "flat vulva",
+          "slim": {
+            "text": "slightly flat vulva",
+            "ref": true
+          },
+          "puffy": "puffy vulva, plump outer labia",
+          "very puffy": "very puffy vulva, plump mons pubis",
+          "cap": {
+            "text": "grotesquely swollen vulva",
+            "direction": "away",
+            "scale": 1.0
+          }
+        }
+      }
+    },
+    {
+      "key": "pectorals",
+      "label": "Pectorals",
+      "phase": "shape",
+      "below": [
+        "flat",
+        "small"
+      ],
+      "levels": [
+        "defined",
+        "large"
+      ],
+      "who": "Men",
+      "concepts": {
+        "anime": {
+          "flat": "flat chest",
+          "small": {
+            "text": "large pectorals",
+            "direction": "away",
+            "scale": 0.7
+          },
+          "defined": "pectorals",
+          "large": "large pectorals",
+          "cap": {
+            "text": "huge pectorals",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "flat": "flat chest",
+          "small": "small pectorals",
+          "defined": "defined pectorals",
+          "large": "large pectorals",
+          "cap": {
+            "text": "huge pectorals, exaggerated chest",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "flat": "flat chest",
+          "small": "small pectorals",
+          "defined": "defined pectorals",
+          "large": "large pectorals",
+          "cap": {
+            "text": "huge pectorals",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "chest"
+    },
+    {
+      "key": "waist",
+      "label": "Waist",
+      "phase": "shape",
+      "below": [
+        "very narrow",
+        "narrow"
+      ],
+      "levels": [
+        "wide",
+        "very wide"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "very narrow": {
+            "text": "narrow waist",
+            "scale": 1.3
+          },
+          "narrow": "narrow waist",
+          "wide": "belly",
+          "very wide": "plump, belly",
+          "cap": {
+            "text": "fat",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "very narrow": "very narrow waist, wasp waist",
+          "narrow": "narrow waist",
+          "wide": "wide waist",
+          "very wide": "very wide waist",
+          "cap": {
+            "text": "extremely wide waist",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "very narrow": "very narrow waist",
+          "narrow": "narrow waist",
+          "wide": "wide waist",
+          "very wide": "very wide waist",
+          "cap": {
+            "text": "extremely wide waist",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "torso-width"
+    },
+    {
+      "key": "hips",
+      "label": "Hips",
+      "phase": "shape",
+      "below": [
+        "very narrow",
+        "narrow"
+      ],
+      "levels": [
+        "wide",
+        "very wide"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "very narrow": {
+            "text": "narrow hips",
+            "scale": 1.3
+          },
+          "narrow": "narrow hips",
+          "wide": "wide hips",
+          "very wide": "wide hips, thick thighs",
+          "cap": {
+            "text": "huge ass",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "very narrow": "very narrow hips",
+          "narrow": "narrow hips",
+          "wide": "wide hips",
+          "very wide": "very wide hips",
+          "cap": {
+            "text": "extremely wide hips",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "very narrow": "very narrow hips",
+          "narrow": "narrow hips",
+          "wide": "wide hips",
+          "very wide": "very wide hips",
+          "cap": {
+            "text": "extremely wide hips",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "torso-width"
+    },
+    {
+      "key": "abs",
+      "label": "Abs",
+      "phase": "detail",
+      "below": [
+        "soft",
+        "faint"
+      ],
+      "levels": [
+        "defined",
+        "six-pack"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "soft": {
+            "text": "abs",
+            "direction": "away"
+          },
+          "faint": {
+            "text": "toned",
+            "ref": true
+          },
+          "defined": "abs, obliques",
+          "six-pack": "abs, six pack, obliques",
+          "cap": {
+            "text": "abs, muscular",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "soft": "smooth flat stomach",
+          "faint": {
+            "text": "subtle abs",
+            "ref": true
+          },
+          "defined": "defined abs",
+          "six-pack": "six pack abs, defined abs",
+          "cap": {
+            "text": "extreme abs, exaggerated abs",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "soft": {
+            "text": "abs",
+            "direction": "away"
+          },
+          "faint": {
+            "text": "subtle abs",
+            "ref": true
+          },
+          "defined": "defined abs",
+          "six-pack": "six pack abs",
+          "cap": {
+            "text": "extreme abs",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "belly",
+      "wait_for": [
+        "build"
+      ],
+      "mask_words": [
+        "abs",
+        "obliques",
+        "stomach",
+        "belly",
+        "toned"
+      ]
+    },
+    {
+      "key": "masc-fem",
+      "label": "Masculine ↔ Feminine",
+      "phase": "shape",
+      "below": [
+        "stark",
+        "masculine"
+      ],
+      "levels": [
+        "feminine",
+        "strong"
+      ],
+      "who": null,
+      "concepts": {
+        "anime": {
+          "stark": "broad shoulders, narrow hips, adam's apple, pectorals",
+          "masculine": "broad shoulders, narrow hips",
+          "feminine": "wide hips, narrow waist",
+          "strong": "wide hips, narrow waist, curvy"
+        },
+        "realistic": {
+          "stark": "broad shoulders, narrow hips, adam's apple, square jaw, masculine torso",
+          "masculine": "broad shoulders, narrow hips, masculine torso",
+          "feminine": "narrow shoulders, wide hips, feminine torso",
+          "strong": "narrow shoulders, wide hips, soft jawline, feminine torso",
+          "cap": {
+            "text": "exaggerated hourglass",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "stark": "broad shoulders, narrow hips, adam's apple, square jaw",
+          "masculine": "broad shoulders, narrow hips",
+          "feminine": "narrow shoulders, wide hips",
+          "strong": "narrow shoulders, wide hips, narrow waist, soft jawline",
+          "cap": {
+            "text": "exaggerated hourglass figure",
+            "direction": "away"
+          }
+        }
+      },
+      "mixed_scene": "off",
+      "region": "build",
+      "area": 0.5
+    },
+    {
+      "key": "muscle",
+      "label": "Muscle definition",
+      "phase": "shape",
+      "below": [
+        "soft",
+        "light"
+      ],
+      "levels": [
+        "toned",
+        "shredded"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "soft": {
+            "text": "muscular, toned",
+            "direction": "away",
+            "scale": 1.2
+          },
+          "light": {
+            "text": "muscular, toned",
+            "direction": "away",
+            "scale": 0.6
+          },
+          "toned": "toned",
+          "shredded": "muscular, toned",
+          "cap": {
+            "text": "veins",
+            "direction": "away",
+            "scale": 1.2
+          }
+        },
+        "realistic": {
+          "soft": {
+            "text": "muscular body, toned body, visible muscle definition",
+            "direction": "away",
+            "scale": 1.2
+          },
+          "light": {
+            "text": "lightly toned body",
+            "ref": true
+          },
+          "toned": "toned body, visible muscle definition",
+          "shredded": "muscular body, well-defined muscles",
+          "cap": {
+            "text": "extreme muscle mass, vascular",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "soft": {
+            "text": "muscular body, toned body",
+            "direction": "away",
+            "scale": 1.2
+          },
+          "light": {
+            "text": "lightly toned body",
+            "ref": true
+          },
+          "toned": "toned body, visible muscle definition",
+          "shredded": "muscular body, well-defined muscles",
+          "cap": {
+            "text": "extreme muscle mass",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "build",
+      "area": 0.5
+    },
+    {
+      "key": "v-line",
+      "label": "V-line",
+      "phase": "detail",
+      "below": [
+        "smooth",
+        "faint"
+      ],
+      "levels": [
+        "defined",
+        "sharp"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "smooth": {
+            "text": "hip bones, obliques",
+            "direction": "away"
+          },
+          "faint": {
+            "text": "hip bones",
+            "ref": true
+          },
+          "defined": "obliques, hip bones",
+          "sharp": "obliques, hip bones, groin"
+        },
+        "realistic": {
+          "smooth": {
+            "text": "v-line, iliac furrow",
+            "direction": "away"
+          },
+          "faint": {
+            "text": "subtle v-line",
+            "ref": true
+          },
+          "defined": "defined v-line, iliac furrow",
+          "sharp": "defined v-line, iliac furrow, lower abs",
+          "cap": {
+            "text": "extreme v-line",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "smooth": {
+            "text": "v-line, hip bones",
+            "direction": "away"
+          },
+          "faint": {
+            "text": "subtle hip bones",
+            "ref": true
+          },
+          "defined": "v-line, hip bones",
+          "sharp": "sharp v-line, hip bones, lower abs",
+          "cap": {
+            "text": "extreme v-line",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "belly",
+      "wait_for": [
+        "build"
+      ]
+    },
+    {
+      "key": "body-fat",
+      "label": "Weight",
+      "phase": "shape",
+      "below": [
+        "skinny",
+        "slim"
+      ],
+      "levels": [
+        "chubby",
+        "heavy"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "skinny": "skinny",
+          "slim": {
+            "text": "skinny",
+            "scale": 0.6
+          },
+          "chubby": {
+            "text": "plump",
+            "scale": 0.6
+          },
+          "heavy": "plump",
+          "cap": {
+            "text": "fat",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "skinny": "skinny, thin body",
+          "slim": "slim body",
+          "chubby": "chubby, soft body",
+          "heavy": "plump, heavyset body",
+          "cap": {
+            "text": "obese",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "skinny": "skinny",
+          "slim": "slim",
+          "chubby": "chubby",
+          "heavy": "plump",
+          "cap": {
+            "text": "obese",
+            "direction": "away"
+          }
+        }
+      },
+      "aliases": {
+        "lean": -2,
+        "curvy": 1,
+        "plump": 2
+      },
+      "region": "build",
+      "area": 0.5
+    },
+    {
+      "key": "body-hair",
+      "label": "Body hair (torso)",
+      "phase": "detail",
+      "below": [
+        "none",
+        "light"
+      ],
+      "levels": [
+        "natural",
+        "hairy"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "none": {
+            "text": "chest hair, navel hair",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "light": {
+            "text": "chest hair, navel hair",
+            "direction": "away",
+            "scale": 0.6
+          },
+          "natural": "chest hair",
+          "hairy": "hairy, chest hair, navel hair",
+          "cap": {
+            "text": "hairy, chest hair, navel hair, arm hair, leg hair",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "none": "smooth hairless chest and stomach",
+          "light": {
+            "text": "sparse chest hair",
+            "ref": true
+          },
+          "natural": "natural chest hair, stomach hair",
+          "hairy": "hairy chest, dense chest hair, hairy stomach",
+          "cap": {
+            "text": "extremely hairy chest and back",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "none": {
+            "text": "chest hair, body hair",
+            "direction": "away"
+          },
+          "light": {
+            "text": "sparse chest hair",
+            "ref": true
+          },
+          "natural": "chest hair, stomach hair",
+          "hairy": "hairy chest, dense chest hair, hairy stomach",
+          "cap": {
+            "text": "extremely hairy chest",
+            "direction": "away"
+          }
+        }
+      },
+      "mask_words": [
+        "chest",
+        "torso",
+        "stomach",
+        "navel"
+      ],
+      "area": 0.15,
+      "wait_for": [
+        "chest",
+        "belly",
+        "build"
+      ],
+      "region": "chest"
+    },
+    {
+      "key": "pubic-hair",
+      "label": "Pubic hair",
+      "phase": "detail",
+      "below": [
+        "none",
+        "sparse"
+      ],
+      "levels": [
+        "natural",
+        "thick"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "none": {
+            "text": "pubic hair",
+            "direction": "away"
+          },
+          "sparse": {
+            "text": "sparse pubic hair",
+            "ref": true
+          },
+          "natural": "pubic hair",
+          "thick": {
+            "text": "pubic hair",
+            "scale": 1.3
+          },
+          "cap": {
+            "text": "excessive pubic hair",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "none": "smooth hairless groin, no pubic hair",
+          "sparse": {
+            "text": "sparse pubic hair",
+            "ref": true
+          },
+          "natural": "natural pubic hair",
+          "thick": "thick dense pubic hair, curly pubic hair",
+          "cap": {
+            "text": "extreme overgrown pubic hair",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "none": {
+            "text": "pubic hair",
+            "direction": "away"
+          },
+          "sparse": {
+            "text": "sparse pubic hair",
+            "ref": true
+          },
+          "natural": "pubic hair",
+          "thick": "thick dense pubic hair",
+          "cap": {
+            "text": "extreme pubic hair",
+            "direction": "away"
+          }
+        }
+      },
+      "mask_words": [
+        "pubic",
+        "groin"
+      ],
+      "area": 0.15,
+      "wait_for": [
+        "penis",
+        "testicles",
+        "vulva",
+        "belly",
+        "build"
+      ],
+      "region": "groin"
+    },
+    {
+      "key": "armpit-hair",
+      "label": "Armpit hair",
+      "phase": "detail",
+      "below": [
+        "none",
+        "sparse"
+      ],
+      "levels": [
+        "natural",
+        "hairy"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "none": {
+            "text": "armpit hair",
+            "direction": "away"
+          },
+          "sparse": {
+            "text": "armpit hair",
+            "direction": "away",
+            "scale": 0.6
+          },
+          "natural": "armpit hair",
+          "hairy": {
+            "text": "armpit hair",
+            "scale": 1.3
+          },
+          "cap": {
+            "text": "excessive armpit hair",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "none": "smooth shaved armpits",
+          "sparse": {
+            "text": "sparse armpit stubble",
+            "ref": true
+          },
+          "natural": "natural armpit hair",
+          "hairy": "hairy armpits, dense armpit hair",
+          "cap": {
+            "text": "extremely hairy armpits",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "none": {
+            "text": "armpit hair",
+            "direction": "away"
+          },
+          "sparse": {
+            "text": "sparse armpit hair",
+            "ref": true
+          },
+          "natural": "armpit hair",
+          "hairy": "hairy armpits, dense armpit hair",
+          "cap": {
+            "text": "excessive armpit hair",
+            "direction": "away"
+          }
+        }
+      },
+      "mask_words": [
+        "armpit",
+        "armpits"
+      ],
+      "area": 0.15,
+      "wait_for": [
+        "upper-body",
+        "chest",
+        "build"
+      ],
+      "region": "upper-body"
+    },
+    {
+      "key": "shoulders",
+      "label": "Shoulders",
+      "phase": "shape",
+      "below": [
+        "narrow",
+        "slim"
+      ],
+      "levels": [
+        "broad",
+        "very broad"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "narrow": {
+            "text": "broad shoulders",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "slim": {
+            "text": "broad shoulders",
+            "direction": "away",
+            "scale": 0.7
+          },
+          "broad": "broad shoulders",
+          "very broad": {
+            "text": "broad shoulders, deltoids",
+            "scale": 1.3
+          }
+        },
+        "realistic": {
+          "narrow": "narrow shoulders",
+          "slim": "slim shoulders",
+          "broad": "broad shoulders",
+          "very broad": "very broad shoulders, defined deltoids",
+          "cap": {
+            "text": "extremely broad shoulders",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "upper-body"
+    },
+    {
+      "key": "back",
+      "label": "Back muscles",
+      "phase": "detail",
+      "below": [
+        "smooth",
+        "soft"
+      ],
+      "levels": [
+        "toned",
+        "muscular"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "smooth": {
+            "text": "back muscles",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "soft": {
+            "text": "back muscles",
+            "direction": "away",
+            "scale": 0.7
+          },
+          "toned": "back muscles, shoulder blades",
+          "muscular": {
+            "text": "back muscles, shoulder blades",
+            "scale": 1.4
+          }
+        },
+        "realistic": {
+          "smooth": "smooth back",
+          "soft": {
+            "text": "slightly toned back",
+            "ref": true
+          },
+          "toned": "toned back, defined shoulder blades",
+          "muscular": "muscular back, defined back muscles",
+          "cap": {
+            "text": "extreme back muscles",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "upper-body",
+      "wait_for": [
+        "build"
+      ],
+      "mask_words": [
+        "back",
+        "shoulder",
+        "blades"
+      ]
+    },
+    {
+      "key": "lats",
+      "label": "Lats (V-taper)",
+      "phase": "shape",
+      "below": [
+        "narrow",
+        "slim"
+      ],
+      "levels": [
+        "wide",
+        "very wide"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "narrow": {
+            "text": "lats, back muscles",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "slim": {
+            "text": "lats",
+            "direction": "away",
+            "scale": 0.7
+          },
+          "wide": "lats, back muscles",
+          "very wide": {
+            "text": "lats, back muscles, broad shoulders",
+            "scale": 1.3
+          }
+        },
+        "realistic": {
+          "narrow": "narrow back, slim torso",
+          "slim": "slim torso",
+          "wide": "wide lats, v-taper torso",
+          "very wide": "very wide lats, strong v-taper torso",
+          "cap": {
+            "text": "extreme lat spread",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "upper-body",
+      "mask_words": [
+        "lats",
+        "back",
+        "torso",
+        "lat"
+      ]
+    },
+    {
+      "key": "biceps",
+      "label": "Biceps",
+      "phase": "shape",
+      "below": [
+        "thin",
+        "slim"
+      ],
+      "levels": [
+        "toned",
+        "large"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "thin": {
+            "text": "biceps, thick arms",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "slim": {
+            "text": "biceps",
+            "direction": "away",
+            "scale": 0.7
+          },
+          "toned": "biceps",
+          "large": {
+            "text": "biceps, thick arms",
+            "scale": 1.3
+          }
+        },
+        "realistic": {
+          "thin": "thin slender arms",
+          "slim": "slim arms",
+          "toned": "toned biceps",
+          "large": "large muscular biceps",
+          "cap": {
+            "text": "extremely huge biceps",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "upper-body"
+    },
+    {
+      "key": "butt",
+      "label": "Butt",
+      "phase": "shape",
+      "below": [
+        "flat",
+        "small"
+      ],
+      "levels": [
+        "round",
+        "large"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "flat": {
+            "text": "flat ass",
+            "scale": 1.3
+          },
+          "small": "flat ass",
+          "round": {
+            "text": "huge ass",
+            "scale": 0.6
+          },
+          "large": "huge ass",
+          "cap": {
+            "text": "huge ass, wide hips, thick thighs",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "flat": "flat buttocks",
+          "small": "small buttocks",
+          "round": "round buttocks",
+          "large": "large round buttocks",
+          "cap": {
+            "text": "gigantic buttocks",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "rear"
+    },
+    {
+      "key": "anus",
+      "label": "Anus",
+      "phase": "detail",
+      "below": [
+        "tight",
+        "small"
+      ],
+      "levels": [
+        "puffy",
+        "very puffy"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "tight": {
+            "text": "spread anus",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "small": {
+            "text": "spread anus",
+            "direction": "away",
+            "scale": 0.7
+          },
+          "puffy": "anus",
+          "very puffy": {
+            "text": "anus",
+            "scale": 1.4
+          },
+          "cap": {
+            "text": "spread anus",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "tight": "tight closed anus",
+          "small": "small anus",
+          "puffy": "puffy anus",
+          "very puffy": "very puffy anus",
+          "cap": {
+            "text": "gaping anus",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "rear",
+      "area": 0.1,
+      "wait_for": [
+        "build"
+      ],
+      "mask_words": [
+        "anus"
+      ]
+    },
+    {
+      "key": "nipples",
+      "label": "Nipples / areolae",
+      "phase": "detail",
+      "below": [
+        "tiny",
+        "small"
+      ],
+      "levels": [
+        "large",
+        "puffy"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "tiny": {
+            "text": "small nipples",
+            "scale": 1.3
+          },
+          "small": "small nipples",
+          "large": "large areolae",
+          "puffy": "puffy nipples, large areolae",
+          "cap": {
+            "text": "huge nipples",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "tiny": "small nipples, small areolae",
+          "small": "small areolae",
+          "large": "large areolae",
+          "puffy": "large puffy areolae",
+          "cap": {
+            "text": "oversized nipples",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "chest",
+      "area": 0.1,
+      "fuse": "nipples",
+      "wait_for": [
+        "build"
+      ],
+      "mask_words": [
+        "nipples",
+        "areolae",
+        "nipple"
+      ]
+    },
+    {
+      "key": "breast-shape",
+      "label": "Breast shape",
+      "phase": "shape",
+      "below": [
+        "very perky",
+        "perky"
+      ],
+      "levels": [
+        "soft",
+        "saggy"
+      ],
+      "who": "Women",
+      "concepts": {
+        "anime": {
+          "very perky": {
+            "text": "perky breasts",
+            "scale": 1.3
+          },
+          "perky": "perky breasts",
+          "soft": {
+            "text": "sagging breasts",
+            "scale": 0.6
+          },
+          "saggy": "sagging breasts"
+        },
+        "realistic": {
+          "very perky": "very perky firm breasts",
+          "perky": "perky breasts",
+          "soft": "soft natural breasts with a slight sag",
+          "saggy": "sagging breasts",
+          "cap": {
+            "text": "extremely saggy breasts",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "chest",
+      "fuse": "breasts",
+      "mask_words": [
+        "breasts",
+        "breast"
+      ]
+    },
+    {
+      "key": "thighs",
+      "label": "Thighs",
+      "phase": "shape",
+      "below": [
+        "thin",
+        "slim"
+      ],
+      "levels": [
+        "thick",
+        "very thick"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "thin": {
+            "text": "thigh gap",
+            "scale": 1.3
+          },
+          "slim": "thigh gap",
+          "thick": {
+            "text": "thick thighs",
+            "scale": 0.7
+          },
+          "very thick": "thick thighs"
+        },
+        "realistic": {
+          "thin": "thin thighs, thigh gap",
+          "slim": "slim thighs",
+          "thick": "thick thighs",
+          "very thick": "very thick thighs",
+          "cap": {
+            "text": "extremely thick thighs",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "legs"
+    },
+    {
+      "key": "foreskin",
+      "label": "Foreskin",
+      "phase": "detail",
+      "below": [
+        "circumcised",
+        "short"
+      ],
+      "levels": [
+        "natural",
+        "long"
+      ],
+      "who": "Men",
+      "concepts": {
+        "anime": {
+          "circumcised": {
+            "text": "foreskin",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "short": {
+            "text": "foreskin",
+            "direction": "away",
+            "scale": 0.7
+          },
+          "natural": "foreskin",
+          "long": {
+            "text": "foreskin",
+            "scale": 1.4
+          }
+        },
+        "realistic": {
+          "circumcised": "circumcised penis",
+          "short": {
+            "text": "short foreskin",
+            "ref": true
+          },
+          "natural": "uncircumcised penis, natural foreskin",
+          "long": "long foreskin",
+          "cap": {
+            "text": "excessively long foreskin",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "penis",
+      "area": 0.1,
+      "fuse": "penis",
+      "mask_words": [
+        "foreskin",
+        "penis",
+        "glans",
+        "circumcised"
+      ]
+    },
+    {
+      "key": "limb-hair",
+      "label": "Arm & leg hair",
+      "phase": "detail",
+      "below": [
+        "none",
+        "light"
+      ],
+      "levels": [
+        "natural",
+        "hairy"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "none": {
+            "text": "arm hair, leg hair",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "light": {
+            "text": "arm hair, leg hair",
+            "direction": "away",
+            "scale": 0.7
+          },
+          "natural": {
+            "text": "arm hair, leg hair",
+            "scale": 0.7
+          },
+          "hairy": "arm hair, leg hair"
+        },
+        "realistic": {
+          "none": "smooth hairless arms and legs",
+          "light": {
+            "text": "sparse arm and leg hair",
+            "ref": true
+          },
+          "natural": "natural arm hair and leg hair",
+          "hairy": "hairy arms, hairy legs",
+          "cap": {
+            "text": "extremely hairy arms and legs",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "none": "smooth hairless arms and legs",
+          "light": {
+            "text": "sparse arm and leg hair",
+            "ref": true
+          },
+          "natural": "arm hair and leg hair",
+          "hairy": "hairy arms, hairy legs",
+          "cap": {
+            "text": "extremely hairy arms and legs",
+            "direction": "away"
+          }
+        }
+      },
+      "mask_words": [
+        "arm",
+        "arms",
+        "leg",
+        "legs"
+      ],
+      "area": 0.15,
+      "wait_for": [
+        "legs",
+        "upper-body",
+        "build"
+      ],
+      "region": "legs"
+    },
+    {
+      "key": "belly",
+      "label": "Belly",
+      "phase": "shape",
+      "below": [
+        "flat",
+        "trim"
+      ],
+      "levels": [
+        "chubby",
+        "pot belly"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "flat": {
+            "text": "big belly, plump",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "trim": {
+            "text": "big belly",
+            "direction": "away",
+            "scale": 0.7
+          },
+          "chubby": "belly, plump",
+          "pot belly": "big belly, fat rolls",
+          "cap": {
+            "text": "pregnant, fat",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "flat": "flat stomach",
+          "trim": "slim belly",
+          "chubby": "soft chubby belly, round belly, belly fat",
+          "pot belly": "big round pot belly, fat belly, belly rolls",
+          "cap": {
+            "text": "obese belly, pregnant belly",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "belly",
+      "mask_words": [
+        "belly",
+        "stomach",
+        "pregnant"
+      ]
+    },
+    {
+      "key": "erection",
+      "label": "Erection",
+      "phase": "shape",
+      "below": [
+        "flaccid",
+        "soft"
+      ],
+      "levels": [
+        "erect",
+        "rock hard"
+      ],
+      "who": "Men",
+      "concepts": {
+        "anime": {
+          "flaccid": {
+            "text": "flaccid",
+            "scale": 1.3
+          },
+          "soft": {
+            "text": "half-erect",
+            "ref": true
+          },
+          "erect": "erection",
+          "rock hard": {
+            "text": "erection",
+            "scale": 1.4
+          }
+        },
+        "realistic": {
+          "flaccid": "flaccid penis, soft hanging penis",
+          "soft": {
+            "text": "semi-erect penis",
+            "ref": true
+          },
+          "erect": "erect penis",
+          "rock hard": "fully erect penis, rock hard erection"
+        }
+      },
+      "region": "penis",
+      "fuse": "penis",
+      "mask_words": [
+        "penis",
+        "erection",
+        "flaccid",
+        "half-erect"
+      ]
+    },
+    {
+      "key": "vulva-wetness",
+      "label": "Vulva wetness",
+      "phase": "detail",
+      "below": [
+        "bone dry",
+        "dry"
+      ],
+      "levels": [
+        "wet",
+        "dripping"
+      ],
+      "who": "Women",
+      "concepts": {
+        "anime": {
+          "bone dry": {
+            "text": "pussy juice",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "dry": {
+            "text": "pussy juice",
+            "direction": "away"
+          },
+          "wet": "pussy juice",
+          "dripping": "pussy juice, pussy juice trail",
+          "cap": {
+            "text": "pussy juice puddle",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "bone dry": {
+            "text": "dry vulva",
+            "scale": 1.3
+          },
+          "dry": "dry vulva",
+          "wet": "wet vulva, moist glistening labia",
+          "dripping": "dripping wet vulva, glistening wet labia, arousal fluid",
+          "cap": {
+            "text": "puddle of fluid, squirting",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "vulva",
+      "area": 0.1,
+      "fuse": "vulva",
+      "mask_words": [
+        "vulva",
+        "labia",
+        "pussy",
+        "squirting"
+      ]
+    },
+    {
+      "key": "nipple-state",
+      "label": "Nipple erection",
+      "phase": "detail",
+      "below": [
+        "soft",
+        "relaxed"
+      ],
+      "levels": [
+        "erect",
+        "hard"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {},
+        "realistic": {
+          "soft": {
+            "text": "soft flat nipples",
+            "scale": 1.3
+          },
+          "relaxed": "soft nipples",
+          "erect": "erect nipples",
+          "hard": "hard erect nipples, pointy nipples, puckered areolae"
+        }
+      },
+      "region": "chest",
+      "area": 0.1,
+      "fuse": "nipples",
+      "wait_for": [
+        "build"
+      ],
+      "mask_words": [
+        "nipples",
+        "areolae"
+      ]
+    },
+    {
+      "key": "flush",
+      "label": "Skin flush",
+      "phase": "detail",
+      "below": [
+        "none",
+        "less"
+      ],
+      "levels": [
+        "flushed",
+        "deep flush"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "none": {
+            "text": "body blush",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "less": {
+            "text": "body blush",
+            "direction": "away"
+          },
+          "flushed": "body blush",
+          "deep flush": {
+            "text": "body blush",
+            "scale": 1.4
+          }
+        },
+        "realistic": {
+          "none": {
+            "text": "flushed skin",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "less": {
+            "text": "flushed skin",
+            "direction": "away"
+          },
+          "flushed": "flushed skin, pink flush on chest",
+          "deep flush": "deeply flushed skin, red aroused flush on chest and neck"
+        }
+      },
+      "region": "skin",
+      "wait_for": [
+        "*"
+      ],
+      "mask_words": [
+        "flush",
+        "flushed",
+        "blush",
+        "chest",
+        "neck"
+      ],
+      "area": 0.6
+    },
+    {
+      "key": "sweat",
+      "label": "Sweat",
+      "phase": "detail",
+      "below": [
+        "dry",
+        "less"
+      ],
+      "levels": [
+        "sweaty",
+        "drenched"
+      ],
+      "who": "Everyone",
+      "concepts": {
+        "anime": {
+          "dry": {
+            "text": "sweat, shiny skin",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "less": {
+            "text": "sweat",
+            "direction": "away"
+          },
+          "sweaty": "sweat, shiny skin",
+          "drenched": "very sweaty, sweat, shiny skin"
+        },
+        "realistic": {
+          "dry": {
+            "text": "sweaty skin, glistening skin",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "less": {
+            "text": "sweaty skin",
+            "direction": "away"
+          },
+          "sweaty": "sweaty skin, glistening skin, sweat drops",
+          "drenched": "drenched in sweat, dripping sweat, wet glistening skin"
+        }
+      },
+      "region": "skin",
+      "wait_for": [
+        "*"
+      ],
+      "mask_words": [
+        "sweat",
+        "sweaty",
+        "drenched"
+      ],
+      "area": 0.6
+    },
+    {
+      "key": "penis-veins",
+      "label": "Penis veins",
+      "phase": "detail",
+      "below": [
+        "smooth",
+        "fewer"
+      ],
+      "levels": [
+        "veiny",
+        "very veiny"
+      ],
+      "who": "Men",
+      "concepts": {
+        "anime": {
+          "smooth": {
+            "text": "veiny penis",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "fewer": {
+            "text": "veiny penis",
+            "direction": "away",
+            "scale": 0.8
+          },
+          "veiny": "veiny penis",
+          "very veiny": {
+            "text": "veiny penis",
+            "scale": 1.4
+          }
+        },
+        "realistic": {
+          "smooth": "smooth penis shaft",
+          "fewer": {
+            "text": "veiny penis",
+            "direction": "away"
+          },
+          "veiny": "veiny penis, visible veins on shaft",
+          "very veiny": "very veiny penis, prominent bulging veins on shaft, detailed penis skin",
+          "cap": {
+            "text": "exaggerated veins on penis",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "penis",
+      "area": 0.1,
+      "fuse": "penis",
+      "mask_words": [
+        "penis",
+        "shaft"
+      ]
+    },
+    {
+      "key": "scrotum",
+      "label": "Scrotum",
+      "phase": "detail",
+      "below": [
+        "tight",
+        "taut"
+      ],
+      "levels": [
+        "loose",
+        "hanging"
+      ],
+      "who": "Men",
+      "concepts": {
+        "anime": {},
+        "realistic": {
+          "tight": "tight high scrotum, smooth taut skin",
+          "taut": {
+            "text": "taut scrotum",
+            "ref": true
+          },
+          "loose": "loose wrinkled scrotum, testicles hanging lower",
+          "hanging": "low hanging testicles, loose deeply wrinkled scrotum",
+          "cap": {
+            "text": "extremely saggy scrotum",
+            "direction": "away",
+            "scale": 1.0
+          }
+        },
+        "stylized": {
+          "tight": "tight high scrotum",
+          "taut": {
+            "text": "taut scrotum",
+            "ref": true
+          },
+          "loose": "loose scrotum, testicles hanging lower",
+          "hanging": "low hanging testicles, loose scrotum",
+          "cap": {
+            "text": "extremely saggy scrotum",
+            "direction": "away",
+            "scale": 1.0
+          }
+        }
+      },
+      "region": "testicles",
+      "area": 0.1,
+      "fuse": "testicles",
+      "mask_words": [
+        "scrotum",
+        "testicles"
+      ],
+      "aliases": {
+        "smooth": -2,
+        "wrinkled": 1,
+        "deeply wrinkled": 2
+      }
+    },
+    {
+      "key": "vulva-texture",
+      "label": "Vulva texture",
+      "phase": "detail",
+      "below": [
+        "smooth",
+        "simple"
+      ],
+      "levels": [
+        "detailed",
+        "fleshy"
+      ],
+      "who": "Women",
+      "concepts": {
+        "anime": {
+          "smooth": "cleft of venus",
+          "simple": {
+            "text": "clitoral hood",
+            "direction": "away"
+          },
+          "detailed": "clitoral hood, clitoris",
+          "fleshy": "clitoral hood, clitoris, pussy juice"
+        },
+        "realistic": {
+          "smooth": "smooth simple vulva, smooth labia",
+          "simple": {
+            "text": "detailed labia folds",
+            "direction": "away"
+          },
+          "detailed": "detailed vulva, textured labia folds, moist pink inner labia",
+          "fleshy": "highly detailed vulva, wrinkled labia folds, glistening moist inner labia, clitoral hood",
+          "cap": {
+            "text": "exaggerated genitals",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "vulva",
+      "area": 0.1,
+      "fuse": "vulva",
+      "mask_words": [
+        "vulva",
+        "labia",
+        "clitoris",
+        "clitoral",
+        "genitals",
+        "venus",
+        "cleft"
+      ]
+    },
+    {
+      "key": "anatomy-fix",
+      "label": "Anatomy fix",
+      "phase": "fix",
+      "below": [],
+      "levels": [
+        "fix",
+        "strong fix"
+      ],
+      "concepts": {
+        "anime": {
+          "fix": [
+            {
+              "text": "extra digits",
+              "direction": "away",
+              "scale": 0.6
+            },
+            {
+              "text": "extra arms, extra legs",
+              "direction": "away",
+              "scale": 0.6
+            },
+            {
+              "text": "extra nipples, extra breasts, extra penises",
+              "direction": "away",
+              "scale": 0.6,
+              "unless": [
+                "chest",
+                "penis",
+                "testicles",
+                "vulva"
+              ]
+            }
+          ],
+          "strong fix": [
+            {
+              "text": "extra digits",
+              "direction": "away",
+              "scale": 0.6
+            },
+            {
+              "text": "extra arms, extra legs",
+              "direction": "away",
+              "scale": 0.6
+            },
+            {
+              "text": "extra nipples, extra breasts, extra penises",
+              "direction": "away",
+              "scale": 0.6,
+              "unless": [
+                "chest",
+                "penis",
+                "testicles",
+                "vulva"
+              ]
+            }
+          ]
+        },
+        "realistic": {
+          "fix": [
+            {
+              "text": "extra fingers, fused fingers",
+              "direction": "away",
+              "scale": 0.6
+            },
+            {
+              "text": "extra arms, extra legs",
+              "direction": "away",
+              "scale": 0.6
+            },
+            {
+              "text": "extra nipples, extra breasts, extra penis",
+              "direction": "away",
+              "scale": 0.6,
+              "unless": [
+                "chest",
+                "penis",
+                "testicles",
+                "vulva"
+              ]
+            }
+          ],
+          "strong fix": [
+            {
+              "text": "extra fingers, fused fingers",
+              "direction": "away",
+              "scale": 0.6
+            },
+            {
+              "text": "extra arms, extra legs",
+              "direction": "away",
+              "scale": 0.6
+            },
+            {
+              "text": "extra nipples, extra breasts, extra penis",
+              "direction": "away",
+              "scale": 0.6,
+              "unless": [
+                "chest",
+                "penis",
+                "testicles",
+                "vulva"
+              ]
+            }
+          ]
+        }
+      },
+      "area": 0.12
+    },
+    {
+      "key": "pose-energy",
+      "label": "Pose energy",
+      "phase": "pose",
+      "scope": "global",
+      "below": [
+        "stiff",
+        "still"
+      ],
+      "levels": [
+        "dynamic",
+        "dramatic"
+      ],
+      "concepts": {
+        "anime": {
+          "stiff": "arms at sides, straight-on, symmetrical pose",
+          "still": "arms at sides",
+          "dynamic": "dynamic pose",
+          "dramatic": "dynamic pose, twisted torso"
+        },
+        "realistic": {
+          "stiff": "stiff symmetrical pose, arms at sides, facing the camera",
+          "still": "relaxed still pose, arms at sides",
+          "dynamic": "dynamic pose, body in motion",
+          "dramatic": "dramatic dynamic pose, twisted torso, asymmetrical pose, expressive gesture"
+        }
+      },
+      "keep_face": true
+    },
+    {
+      "key": "pose-style",
+      "label": "Pose style",
+      "phase": "pose",
+      "scope": "global",
+      "keep_face": true,
+      "below": [
+        "powerful",
+        "confident"
+      ],
+      "levels": [
+        "graceful",
+        "sensual"
+      ],
+      "concepts": {
+        "anime": {
+          "women": {
+            "powerful": {
+              "variants": [
+                "legs apart, crossed arms",
+                "legs apart, clenched hands",
+                "fighting stance, legs apart"
+              ]
+            },
+            "confident": {
+              "variants": [
+                "hands on own hips, legs apart",
+                "hand on own hip, leaning back",
+                "crossed arms, leaning back"
+              ]
+            },
+            "graceful": {
+              "variants": [
+                "contrapposto, hand on own hip, head tilt",
+                "contrapposto, hand on own chest, head tilt",
+                "contrapposto, hand in own hair"
+              ]
+            },
+            "sensual": {
+              "variants": [
+                "contrapposto, arched back, hand in own hair",
+                "arched back, looking back",
+                "arms up, arched back, stretching",
+                "hand on own thigh, arched back, head tilt"
+              ]
+            }
+          },
+          "men": {
+            "powerful": {
+              "variants": [
+                "legs apart, crossed arms",
+                "legs apart, clenched hands",
+                "fighting stance, clenched hands"
+              ]
+            },
+            "confident": {
+              "variants": [
+                "hands on own hips, legs apart",
+                "crossed arms, leaning back",
+                "hand on own chin, legs apart"
+              ]
+            },
+            "graceful": {
+              "variants": [
+                "contrapposto, hand on own chin",
+                "contrapposto, hand on own chest",
+                "standing on one leg, arm behind head"
+              ]
+            },
+            "sensual": {
+              "variants": [
+                "arms behind head, leaning back",
+                "arm behind head, arched back",
+                "arms up, stretching",
+                "hand on own stomach, leaning back"
+              ]
+            }
+          },
+          "any": {
+            "powerful": "legs apart, crossed arms",
+            "confident": "hands on own hips",
+            "graceful": "contrapposto, head tilt",
+            "sensual": "arched back, arms up"
+          }
+        },
+        "realistic": {
+          "women": {
+            "powerful": {
+              "variants": [
+                "wide powerful stance, legs apart, arms crossed over chest",
+                "strong stance, legs apart, fists clenched",
+                "fighting stance, legs apart, fists raised"
+              ]
+            },
+            "confident": {
+              "variants": [
+                "confident stance, hands on hips",
+                "confident pose, one hand on hip, leaning back slightly",
+                "arms crossed, leaning back, relaxed confident stance"
+              ]
+            },
+            "graceful": {
+              "variants": [
+                "graceful pose, weight on one leg, hand on hip, head slightly tilted",
+                "graceful pose, weight on one leg, hand on chest, head tilted",
+                "elegant pose, weight on one leg, hand touching her hair"
+              ]
+            },
+            "sensual": {
+              "variants": [
+                "sensual pose, arched back, hand running through hair",
+                "sensual pose, arched back, looking back over the shoulder",
+                "sensual pose, arms raised above head, arched back, stretching",
+                "sensual pose, hand on thigh, hip pushed to the side, head tilted"
+              ]
+            }
+          },
+          "men": {
+            "powerful": {
+              "variants": [
+                "wide powerful stance, legs apart, arms crossed over chest, squared shoulders",
+                "strong stance, legs apart, fists clenched, chest out",
+                "fighting stance, fists raised, legs apart"
+              ]
+            },
+            "confident": {
+              "variants": [
+                "confident stance, hands on hips, legs apart",
+                "arms crossed, leaning back, relaxed confident stance",
+                "confident pose, hand on chin, legs apart"
+              ]
+            },
+            "graceful": {
+              "variants": [
+                "relaxed pose, weight on one leg, hand on chin",
+                "relaxed elegant pose, weight on one leg, hand on chest",
+                "relaxed pose, standing on one leg, one arm behind head"
+              ]
+            },
+            "sensual": {
+              "variants": [
+                "sensual pose, both arms behind head, leaning back",
+                "sensual pose, one arm behind head, back arched",
+                "sensual pose, arms raised, stretching",
+                "sensual pose, hand on stomach, leaning back"
+              ]
+            }
+          },
+          "any": {
+            "powerful": "wide powerful stance, legs apart, arms crossed",
+            "confident": "confident stance, hands on hips",
+            "graceful": "graceful pose, weight on one leg, head slightly tilted",
+            "sensual": "sensual pose, arched back, arms raised"
+          }
+        }
+      },
+      "by_scene": true,
+      "mixed_scene": "off"
+    },
+    {
+      "key": "camera-height",
+      "label": "Camera height",
+      "phase": "pose",
+      "scope": "global",
+      "below": [
+        "high above",
+        "above"
+      ],
+      "levels": [
+        "below",
+        "low below"
+      ],
+      "concepts": {
+        "anime": {
+          "high above": {
+            "text": "from above",
+            "scale": 1.3
+          },
+          "above": "from above",
+          "below": "from below",
+          "low below": {
+            "text": "from below",
+            "scale": 1.3
+          }
+        },
+        "realistic": {
+          "high above": "high angle shot from far above, bird's eye view",
+          "above": "slightly high angle shot from above",
+          "below": "low angle shot from below",
+          "low below": "extreme low angle shot from far below, worm's eye view"
+        }
+      },
+      "keep_face": true
+    },
+    {
+      "key": "head-turn",
+      "label": "Head turn",
+      "phase": "pose",
+      "scope": "global",
+      "below": [
+        "at viewer",
+        "toward"
+      ],
+      "levels": [
+        "three-quarter",
+        "away"
+      ],
+      "concepts": {
+        "anime": {
+          "at viewer": "looking at viewer, facing viewer",
+          "toward": "looking at viewer",
+          "three-quarter": "looking to the side, head tilt",
+          "away": "looking to the side, profile"
+        },
+        "realistic": {
+          "at viewer": "facing the camera, looking straight at the camera",
+          "toward": "looking at the camera",
+          "three-quarter": "three-quarter view, head turned to the side",
+          "away": "looking away, head turned away, profile view"
+        }
+      }
+    },
+    {
+      "key": "facial-hair",
+      "label": "Facial hair",
+      "phase": "detail",
+      "who": "Men",
+      "area": 0.12,
+      "face": "features",
+      "below": [
+        "clean-shaven",
+        "less"
+      ],
+      "levels": [
+        "stubble",
+        "full beard"
+      ],
+      "concepts": {
+        "anime": {
+          "clean-shaven": {
+            "text": "facial hair, beard, stubble",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "less": {
+            "text": "facial hair",
+            "direction": "away"
+          },
+          "stubble": "stubble",
+          "full beard": "beard, mustache, full beard",
+          "cap": {
+            "text": "thick beard",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "clean-shaven": "clean-shaven smooth face",
+          "less": {
+            "text": "beard, stubble",
+            "direction": "away"
+          },
+          "stubble": "stubble, short beard",
+          "full beard": "full thick beard, mustache",
+          "cap": {
+            "text": "extremely long bushy beard",
+            "direction": "away"
+          }
+        }
+      },
+      "mask_words": [
+        "beard",
+        "stubble",
+        "mustache",
+        "facial",
+        "shaven",
+        "face"
+      ],
+      "region": "face"
+    },
+    {
+      "key": "skin-realism",
+      "label": "Skin realism",
+      "phase": "detail",
+      "area": 0.6,
+      "face": "features",
+      "below": [
+        "airbrushed",
+        "smooth"
+      ],
+      "levels": [
+        "natural",
+        "detailed"
+      ],
+      "note": "Realistic and Stylized only: off in the Anime profile (anime skin has no pores to draw).",
+      "concepts": {
+        "anime": {},
+        "realistic": {
+          "airbrushed": "airbrushed flawless smooth skin, retouched skin",
+          "smooth": "smooth even skin",
+          "natural": "natural skin texture, visible skin pores",
+          "detailed": "highly detailed natural skin texture, visible pores, fine skin imperfections, subsurface scattering",
+          "cap": {
+            "text": "exaggerated skin pores, rough blotchy skin",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "airbrushed": "smooth plastic-looking cgi skin",
+          "smooth": "smooth even skin",
+          "natural": "realistic skin texture, skin pores",
+          "detailed": "detailed realistic skin texture, visible pores, subsurface scattering",
+          "cap": {
+            "text": "exaggerated skin pores",
+            "direction": "away"
+          }
+        }
+      },
+      "region": "skin",
+      "wait_for": [
+        "*"
+      ]
+    },
+    {
+      "key": "cum",
+      "label": "Cum",
+      "phase": "detail",
+      "who": "Everyone",
+      "area": 0.5,
+      "below": [
+        "none",
+        "less"
+      ],
+      "levels": [
+        "some",
+        "a lot"
+      ],
+      "concepts": {
+        "anime": {
+          "none": {
+            "text": "cum",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "less": {
+            "text": "cum",
+            "direction": "away"
+          },
+          "some": "cum, cumdrip",
+          "a lot": "excessive cum, cum on body, cum string",
+          "cap": {
+            "text": "cum pool",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "none": {
+            "text": "semen, cum",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "less": {
+            "text": "semen",
+            "direction": "away"
+          },
+          "some": "semen, cum dripping",
+          "a lot": "excessive cum, thick ropes of semen on body, dripping cum",
+          "cap": {
+            "text": "pool of semen",
+            "direction": "away"
+          }
+        }
+      },
+      "face": "features",
+      "note": "Anywhere on the body, face and hair included; the prompt says where (cum on face, in hair...). Protect face still keeps eyes, eyebrows, nose and lips.",
+      "wait_for": [
+        "*"
+      ],
+      "mask_words": [
+        "cum",
+        "semen"
+      ]
+    },
+    {
+      "key": "penis-wetness",
+      "label": "Penis wetness",
+      "phase": "detail",
+      "who": "Men",
+      "area": 0.1,
+      "region": "penis",
+      "below": [
+        "dry",
+        "less"
+      ],
+      "levels": [
+        "wet",
+        "dripping"
+      ],
+      "concepts": {
+        "anime": {
+          "dry": {
+            "text": "precum, cum on penis",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "less": {
+            "text": "precum",
+            "direction": "away"
+          },
+          "wet": "precum",
+          "dripping": "precum, cum on penis"
+        },
+        "realistic": {
+          "dry": "dry penis",
+          "less": {
+            "text": "wet glistening penis",
+            "direction": "away"
+          },
+          "wet": "wet glistening penis shaft",
+          "dripping": "dripping wet penis, glistening shaft covered in fluid"
+        }
+      },
+      "fuse": "penis",
+      "mask_words": [
+        "penis",
+        "shaft",
+        "precum"
+      ]
+    },
+    {
+      "key": "anus-wetness",
+      "label": "Anus wetness",
+      "phase": "detail",
+      "who": "Everyone",
+      "area": 0.1,
+      "region": "rear",
+      "below": [
+        "dry",
+        "less"
+      ],
+      "levels": [
+        "wet",
+        "dripping"
+      ],
+      "concepts": {
+        "anime": {
+          "dry": {
+            "text": "lube, anal fluid",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "less": {
+            "text": "lube",
+            "direction": "away"
+          },
+          "wet": "lube",
+          "dripping": "lube, anal fluid"
+        },
+        "realistic": {
+          "dry": "dry anus",
+          "less": {
+            "text": "wet glistening anus",
+            "direction": "away"
+          },
+          "wet": "wet glistening anus, lube",
+          "dripping": "dripping wet anus, glistening with lube"
+        }
+      },
+      "wait_for": [
+        "build"
+      ],
+      "mask_words": [
+        "anus",
+        "lube",
+        "anal"
+      ]
+    },
+    {
+      "key": "skin-tone",
+      "label": "Skin tone",
+      "phase": "shape",
+      "who": "Everyone",
+      "area": 0.7,
+      "face": "features",
+      "region": "skin",
+      "below": [
+        "pale",
+        "fair"
+      ],
+      "levels": [
+        "tan",
+        "dark"
+      ],
+      "note": "The whole body and the face skin together, so face and body match; eyes, eyebrows, nose and lips stay.",
+      "concepts": {
+        "anime": {
+          "pale": {
+            "text": "pale skin",
+            "scale": 1.3
+          },
+          "fair": {
+            "text": "pale skin",
+            "scale": 0.6
+          },
+          "tan": "tan",
+          "dark": "dark skin"
+        },
+        "realistic": {
+          "pale": "very pale porcelain skin",
+          "fair": "fair skin",
+          "tan": "tanned sun-kissed skin",
+          "dark": "deep dark brown skin"
+        }
+      }
+    },
+    {
+      "key": "nipple-color",
+      "label": "Nipple melanin",
+      "phase": "detail",
+      "who": "Everyone",
+      "area": 0.1,
+      "region": "chest",
+      "below": [
+        "pale pink",
+        "pink"
+      ],
+      "levels": [
+        "brown",
+        "dark"
+      ],
+      "concepts": {
+        "anime": {
+          "pale pink": {
+            "text": "dark nipples, dark areolae",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "pink": {
+            "text": "dark nipples",
+            "direction": "away"
+          },
+          "brown": {
+            "text": "dark nipples",
+            "scale": 0.6
+          },
+          "dark": "dark nipples, dark areolae"
+        },
+        "realistic": {
+          "pale pink": "pale pink nipples and areolae",
+          "pink": "pink nipples",
+          "brown": "brown nipples, brown areolae",
+          "dark": "dark brown nipples, dark areolae"
+        }
+      },
+      "fuse": "nipples",
+      "wait_for": [
+        "build"
+      ],
+      "mask_words": [
+        "nipples",
+        "areolae"
+      ]
+    },
+    {
+      "key": "scars",
+      "label": "Scars",
+      "mask_words": [
+        "scar",
+        "scars",
+        "scarred"
+      ],
+      "below": [
+        "none",
+        "fewer"
+      ],
+      "levels": [
+        "some",
+        "many"
+      ],
+      "concepts": {
+        "anime": {
+          "none": {
+            "text": "scar",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "fewer": {
+            "text": "scar",
+            "direction": "away"
+          },
+          "some": {
+            "text": "scar",
+            "scale": 0.7
+          },
+          "many": "scar, scar on chest",
+          "cap": {
+            "text": "scar on face",
+            "direction": "away"
+          }
+        },
+        "realistic": {
+          "none": {
+            "text": "scars, scarred skin",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "fewer": {
+            "text": "scars",
+            "direction": "away"
+          },
+          "some": "a few small scars on skin",
+          "many": "visible scars on skin, scarred skin",
+          "cap": {
+            "text": "heavily scarred disfigured skin",
+            "direction": "away"
+          }
+        }
+      },
+      "phase": "detail",
+      "who": "Everyone",
+      "area": 0.6,
+      "face": "features",
+      "region": "skin",
+      "wait_for": [
+        "*"
+      ],
+      "spots": true
+    },
+    {
+      "key": "moles",
+      "label": "Moles / beauty marks",
+      "mask_words": [
+        "mole",
+        "moles"
+      ],
+      "below": [
+        "none",
+        "fewer"
+      ],
+      "levels": [
+        "some",
+        "many"
+      ],
+      "concepts": {
+        "anime": {
+          "none": {
+            "text": "mole",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "fewer": {
+            "text": "mole",
+            "direction": "away"
+          },
+          "some": {
+            "text": "mole",
+            "scale": 0.7
+          },
+          "many": "mole, mole on breast, mole on thigh"
+        },
+        "realistic": {
+          "none": {
+            "text": "moles, beauty marks",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "fewer": {
+            "text": "moles",
+            "direction": "away"
+          },
+          "some": "a few small moles, beauty mark",
+          "many": "many small moles on skin, beauty marks"
+        }
+      },
+      "phase": "detail",
+      "who": "Everyone",
+      "area": 0.6,
+      "face": "features",
+      "region": "skin",
+      "wait_for": [
+        "*"
+      ],
+      "spots": true
+    },
+    {
+      "key": "birthmarks",
+      "label": "Birthmarks",
+      "mask_words": [
+        "birthmark",
+        "birthmarks"
+      ],
+      "below": [
+        "none",
+        "fewer"
+      ],
+      "levels": [
+        "small",
+        "large"
+      ],
+      "concepts": {
+        "anime": {
+          "none": {
+            "text": "birthmark",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "fewer": {
+            "text": "birthmark",
+            "direction": "away"
+          },
+          "small": {
+            "text": "birthmark",
+            "scale": 0.7
+          },
+          "large": {
+            "text": "birthmark",
+            "scale": 1.3
+          }
+        },
+        "realistic": {
+          "none": {
+            "text": "birthmark, skin discoloration",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "fewer": {
+            "text": "birthmark",
+            "direction": "away"
+          },
+          "small": "small birthmark on skin",
+          "large": "large birthmark on skin, port-wine stain"
+        }
+      },
+      "phase": "detail",
+      "who": "Everyone",
+      "area": 0.6,
+      "face": "features",
+      "region": "skin",
+      "wait_for": [
+        "*"
+      ],
+      "spots": true
+    },
+    {
+      "key": "freckles",
+      "label": "Freckles",
+      "mask_words": [
+        "freckles",
+        "freckled"
+      ],
+      "below": [
+        "none",
+        "fewer"
+      ],
+      "levels": [
+        "some",
+        "dense"
+      ],
+      "concepts": {
+        "anime": {
+          "none": {
+            "text": "freckles",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "fewer": {
+            "text": "freckles",
+            "direction": "away"
+          },
+          "some": {
+            "text": "freckles",
+            "scale": 0.7
+          },
+          "dense": {
+            "text": "freckles",
+            "scale": 1.3
+          }
+        },
+        "realistic": {
+          "none": {
+            "text": "freckles",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "fewer": {
+            "text": "freckles",
+            "direction": "away"
+          },
+          "some": "sparse freckles",
+          "dense": "dense freckles on face and body, freckled skin"
+        }
+      },
+      "phase": "detail",
+      "who": "Everyone",
+      "area": 0.6,
+      "face": "features",
+      "region": "skin",
+      "wait_for": [
+        "*"
+      ],
+      "spots": true
+    },
+    {
+      "key": "wrinkles",
+      "label": "Wrinkles",
+      "phase": "detail",
+      "who": "Everyone",
+      "area": 0.6,
+      "face": "features",
+      "region": "skin",
+      "wait_for": [
+        "*"
+      ],
+      "mask_words": [
+        "wrinkles",
+        "wrinkled",
+        "creases",
+        "crow"
+      ],
+      "below": [],
+      "levels": [
+        "fine lines",
+        "deep"
+      ],
+      "concepts": {
+        "anime": {
+          "fine lines": {
+            "text": "wrinkled skin",
+            "scale": 0.6
+          },
+          "deep": {
+            "text": "wrinkled skin",
+            "scale": 1.3
+          }
+        },
+        "realistic": {
+          "fine lines": "fine lines on skin, crow's feet",
+          "deep": "deep wrinkles, wrinkled skin, deep creases"
+        }
+      }
+    },
+    {
+      "key": "stretch-marks",
+      "label": "Stretch marks",
+      "phase": "detail",
+      "who": "Everyone",
+      "area": 0.4,
+      "region": "skin",
+      "wait_for": [
+        "*"
+      ],
+      "mask_words": [
+        "stretch"
+      ],
+      "below": [
+        "none",
+        "fewer"
+      ],
+      "levels": [
+        "some",
+        "many"
+      ],
+      "concepts": {
+        "anime": {
+          "none": {
+            "text": "stretch marks",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "fewer": {
+            "text": "stretch marks",
+            "direction": "away"
+          },
+          "some": {
+            "text": "stretch marks",
+            "scale": 0.8
+          },
+          "many": {
+            "text": "stretch marks",
+            "scale": 1.4
+          }
+        },
+        "realistic": {
+          "none": {
+            "text": "stretch marks",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "fewer": {
+            "text": "stretch marks",
+            "direction": "away"
+          },
+          "some": "faint stretch marks on skin",
+          "many": "visible stretch marks on hips, thighs and belly",
+          "cap": {
+            "text": "deep purple stretch marks covering the body",
+            "direction": "away"
+          }
+        }
+      },
+      "spots": true
+    },
+    {
+      "key": "cellulite",
+      "label": "Cellulite",
+      "phase": "detail",
+      "who": "Everyone",
+      "area": 0.4,
+      "region": "skin",
+      "wait_for": [
+        "*"
+      ],
+      "mask_words": [
+        "cellulite",
+        "dimpled"
+      ],
+      "below": [
+        "none",
+        "fewer"
+      ],
+      "levels": [
+        "some",
+        "visible"
+      ],
+      "concepts": {
+        "anime": {},
+        "realistic": {
+          "none": {
+            "text": "cellulite, dimpled skin",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "fewer": {
+            "text": "cellulite",
+            "direction": "away"
+          },
+          "some": "slight cellulite on thighs",
+          "visible": "visible cellulite on thighs and buttocks, dimpled skin",
+          "cap": {
+            "text": "severe cellulite",
+            "direction": "away"
+          }
+        },
+        "stylized": {
+          "none": {
+            "text": "cellulite",
+            "direction": "away",
+            "scale": 1.3
+          },
+          "fewer": {
+            "text": "cellulite",
+            "direction": "away"
+          },
+          "some": "slight cellulite on thighs",
+          "visible": "cellulite on thighs and buttocks",
+          "cap": {
+            "text": "severe cellulite",
+            "direction": "away"
+          }
+        }
+      }
+    }
+  ],
+  "taper": 0.3,
+  "face_every": 4,
+  "face_threshold": 0.35,
+  "face_max_area": 0.4,
+  "control": {
+    "balanced": 1.0,
+    "prompt": 0.7,
+    "sliders": 1.3
+  },
+  "clashes": [
+    {
+      "sliders": [
+        "belly",
+        "abs"
+      ],
+      "signs": [
+        [
+          1,
+          1
+        ],
+        [
+          -1,
+          -1
+        ]
+      ]
+    },
+    {
+      "sliders": [
+        "belly",
+        "body-fat"
+      ],
+      "signs": [
+        [
+          1,
+          -1
+        ],
+        [
+          -1,
+          1
+        ]
+      ]
+    },
+    {
+      "sliders": [
+        "abs",
+        "body-fat"
+      ],
+      "signs": [
+        [
+          1,
+          1
+        ],
+        [
+          -1,
+          -1
+        ]
+      ]
+    },
+    {
+      "sliders": [
+        "abs",
+        "muscle"
+      ],
+      "signs": [
+        [
+          1,
+          -1
+        ],
+        [
+          -1,
+          1
+        ]
+      ]
+    },
+    {
+      "sliders": [
+        "muscle",
+        "body-fat"
+      ],
+      "signs": [
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "sliders": [
+        "waist",
+        "body-fat"
+      ],
+      "signs": [
+        [
+          -1,
+          1
+        ],
+        [
+          1,
+          -1
+        ]
+      ]
+    },
+    {
+      "sliders": [
+        "breasts",
+        "breast-shape"
+      ],
+      "signs": [
+        [
+          -1,
+          1
+        ]
+      ]
+    },
+    {
+      "sliders": [
+        "breasts",
+        "pectorals"
+      ],
+      "signs": [
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "sliders": [
+        "vulva",
+        "vulva-texture"
+      ],
+      "signs": [
+        [
+          -1,
+          1
+        ]
+      ]
+    },
+    {
+      "sliders": [
+        "erection",
+        "penis-veins"
+      ],
+      "signs": [
+        [
+          -1,
+          1
+        ]
+      ]
+    },
+    {
+      "sliders": [
+        "masc-fem",
+        "breasts"
+      ],
+      "signs": [
+        [
+          -1,
+          1
+        ]
+      ]
+    },
+    {
+      "sliders": [
+        "masc-fem",
+        "pectorals"
+      ],
+      "signs": [
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "sliders": [
+        "pose-energy",
+        "pose-style"
+      ],
+      "signs": [
+        [
+          -1,
+          1
+        ],
+        [
+          -1,
+          -1
+        ]
+      ]
+    }
+  ],
+  "stale_decay": 0.6,
+  "overlap_budget": 1.5,
+  "nudity_lock": {
+    "gain": 0.6,
+    "phase": "shape",
+    "area": 0.5,
+    "concepts": {
+      "anime": "clothes, shirt, bra, panties, skirt, pants",
+      "realistic": "wearing clothes, shirt, underwear, bra, panties, pants"
+    }
+  },
+  "face_core_threshold": 0.65,
+  "warn_time": 8.0,
+  "region_warn": 4,
+  "overlap_warn": 0.01,
+  "edit_cap": 1.0
+}

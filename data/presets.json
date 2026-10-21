@@ -1,0 +1,1285 @@
+{
+  "_comment": [
+    "Body presets: picking one fills the sliders of its scope and sets the scope's other sliders to 0. Never touched: Pose, Arousal, Skin tone and Nipple melanin (no body type comes with a skin colour), Anatomy fix.",
+    "Per profile: a preset's 'profiles' overrides apply on that profile (Porn star: airbrushed skin on Realistic and Stylized only); a slider that is off on a profile (Skin realism, Cellulite, Scrotum in Anime) is left at 0 there.",
+    "At most 9 sliders per variant, profile overrides included: every moved slider costs passes, and 10 or more are capped where they overlap."
+  ],
+  "scope": [
+    "masc-fem",
+    "shoulders",
+    "waist",
+    "hips",
+    "thighs",
+    "butt",
+    "nipples",
+    "muscle",
+    "body-fat",
+    "belly",
+    "lats",
+    "biceps",
+    "abs",
+    "v-line",
+    "back",
+    "breasts",
+    "breast-shape",
+    "vulva",
+    "vulva-puffy",
+    "vulva-texture",
+    "penis",
+    "penis-girth",
+    "testicles",
+    "pectorals",
+    "scrotum",
+    "foreskin",
+    "skin-realism",
+    "cellulite",
+    "stretch-marks",
+    "scars",
+    "moles",
+    "birthmarks",
+    "freckles",
+    "wrinkles",
+    "facial-hair",
+    "body-hair",
+    "pubic-hair",
+    "armpit-hair",
+    "limb-hair"
+  ],
+  "presets": [
+    {
+      "name": "♀ Hourglass",
+      "group": "women",
+      "variants": [
+        {
+          "name": "balanced",
+          "sliders": {
+            "masc-fem": 1,
+            "waist": -1,
+            "hips": 1,
+            "breasts": 1,
+            "butt": 1
+          }
+        },
+        {
+          "name": "busty",
+          "sliders": {
+            "masc-fem": 1,
+            "waist": -1,
+            "hips": 1,
+            "breasts": 2,
+            "butt": 1
+          }
+        },
+        {
+          "name": "small bust",
+          "sliders": {
+            "masc-fem": 1,
+            "waist": -1,
+            "hips": 1,
+            "breasts": -1,
+            "butt": 1,
+            "pubic-hair": -1
+          }
+        },
+        {
+          "name": "full hips",
+          "sliders": {
+            "masc-fem": 1,
+            "waist": -1,
+            "hips": 2,
+            "breasts": 1,
+            "butt": 1,
+            "thighs": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♀ Pear",
+      "group": "women",
+      "variants": [
+        {
+          "name": "classic",
+          "sliders": {
+            "hips": 2,
+            "thighs": 1,
+            "butt": 1,
+            "breasts": -1,
+            "waist": -1,
+            "vulva-puffy": 1
+          }
+        },
+        {
+          "name": "slim top",
+          "sliders": {
+            "hips": 2,
+            "thighs": 1,
+            "butt": 1,
+            "breasts": -2,
+            "waist": -1,
+            "shoulders": -1
+          }
+        },
+        {
+          "name": "thick thighs",
+          "sliders": {
+            "hips": 2,
+            "thighs": 2,
+            "butt": 1,
+            "breasts": -1,
+            "waist": -1,
+            "cellulite": 1
+          }
+        },
+        {
+          "name": "full bust",
+          "sliders": {
+            "hips": 2,
+            "thighs": 1,
+            "butt": 1,
+            "breasts": 1,
+            "waist": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♀ Apple",
+      "group": "women",
+      "variants": [
+        {
+          "name": "soft",
+          "sliders": {
+            "belly": 1,
+            "waist": 1,
+            "breasts": 1,
+            "body-fat": 1
+          }
+        },
+        {
+          "name": "busty",
+          "sliders": {
+            "belly": 1,
+            "waist": 1,
+            "breasts": 2,
+            "body-fat": 1
+          }
+        },
+        {
+          "name": "slim legs",
+          "sliders": {
+            "belly": 1,
+            "waist": 1,
+            "breasts": 1,
+            "body-fat": 1,
+            "thighs": -1
+          }
+        },
+        {
+          "name": "rounder",
+          "sliders": {
+            "belly": 2,
+            "waist": 1,
+            "breasts": 1,
+            "body-fat": 1,
+            "stretch-marks": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♀ Rectangle",
+      "group": "women",
+      "variants": [
+        {
+          "name": "slim",
+          "sliders": {
+            "hips": -1,
+            "breasts": -1,
+            "butt": -1,
+            "body-fat": -1
+          }
+        },
+        {
+          "name": "toned",
+          "sliders": {
+            "hips": -1,
+            "breasts": -1,
+            "butt": -1,
+            "muscle": 1,
+            "abs": 1
+          }
+        },
+        {
+          "name": "soft",
+          "sliders": {
+            "hips": -1,
+            "breasts": -1,
+            "butt": -1,
+            "body-fat": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♀ Top-heavy",
+      "group": "women",
+      "variants": [
+        {
+          "name": "classic",
+          "sliders": {
+            "shoulders": 1,
+            "breasts": 2,
+            "hips": -1,
+            "thighs": -1
+          }
+        },
+        {
+          "name": "soft",
+          "sliders": {
+            "shoulders": 1,
+            "breasts": 2,
+            "hips": -1,
+            "thighs": -1,
+            "breast-shape": 1,
+            "body-fat": 1
+          }
+        },
+        {
+          "name": "athletic",
+          "sliders": {
+            "shoulders": 1,
+            "breasts": 2,
+            "hips": -1,
+            "thighs": -1,
+            "muscle": 1
+          }
+        },
+        {
+          "name": "perky",
+          "sliders": {
+            "shoulders": 1,
+            "breasts": 2,
+            "hips": -1,
+            "thighs": -1,
+            "breast-shape": -1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♀ Slender",
+      "group": "women",
+      "variants": [
+        {
+          "name": "small bust",
+          "sliders": {
+            "body-fat": -1,
+            "waist": -1,
+            "hips": -1,
+            "thighs": -1,
+            "breasts": -1
+          }
+        },
+        {
+          "name": "full bust",
+          "sliders": {
+            "body-fat": -1,
+            "waist": -1,
+            "hips": -1,
+            "thighs": -1,
+            "breasts": 1
+          }
+        },
+        {
+          "name": "closed",
+          "sliders": {
+            "body-fat": -1,
+            "waist": -1,
+            "hips": -1,
+            "thighs": -1,
+            "vulva": -1,
+            "vulva-puffy": -1,
+            "pubic-hair": -2
+          }
+        },
+        {
+          "name": "freckled",
+          "sliders": {
+            "body-fat": -1,
+            "waist": -1,
+            "hips": -1,
+            "thighs": -1,
+            "freckles": 1,
+            "moles": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♀ Athletic",
+      "group": "women",
+      "variants": [
+        {
+          "name": "toned",
+          "sliders": {
+            "muscle": 1,
+            "abs": 1,
+            "body-fat": -1,
+            "waist": -1
+          }
+        },
+        {
+          "name": "defined",
+          "sliders": {
+            "muscle": 1,
+            "abs": 2,
+            "body-fat": -1,
+            "waist": -1,
+            "v-line": 1
+          }
+        },
+        {
+          "name": "runner",
+          "sliders": {
+            "muscle": 1,
+            "abs": 1,
+            "body-fat": -1,
+            "waist": -1,
+            "breasts": -1,
+            "thighs": -1
+          }
+        },
+        {
+          "name": "busty fit",
+          "sliders": {
+            "muscle": 1,
+            "abs": 1,
+            "body-fat": -1,
+            "waist": -1,
+            "breasts": 1,
+            "butt": 1
+          }
+        }
+      ],
+      "profiles": {
+        "realistic": {
+          "skin-realism": 1
+        },
+        "stylized": {
+          "skin-realism": 1
+        }
+      }
+    },
+    {
+      "name": "♀ Muscular",
+      "group": "women",
+      "variants": [
+        {
+          "name": "fitness",
+          "sliders": {
+            "muscle": 2,
+            "abs": 2,
+            "shoulders": 1,
+            "biceps": 1,
+            "back": 1,
+            "pubic-hair": -2
+          }
+        },
+        {
+          "name": "strong",
+          "sliders": {
+            "muscle": 2,
+            "abs": 2,
+            "shoulders": 1,
+            "biceps": 1,
+            "back": 1,
+            "thighs": 2,
+            "butt": 1
+          }
+        },
+        {
+          "name": "lean",
+          "sliders": {
+            "muscle": 2,
+            "abs": 2,
+            "shoulders": 1,
+            "biceps": 1,
+            "back": 1,
+            "body-fat": -1,
+            "v-line": 1
+          }
+        },
+        {
+          "name": "scarred",
+          "sliders": {
+            "muscle": 2,
+            "abs": 2,
+            "shoulders": 1,
+            "biceps": 1,
+            "back": 1,
+            "scars": 1
+          }
+        }
+      ],
+      "profiles": {
+        "realistic": {
+          "skin-realism": 1
+        },
+        "stylized": {
+          "skin-realism": 1
+        }
+      }
+    },
+    {
+      "name": "♀ Curvy",
+      "group": "women",
+      "variants": [
+        {
+          "name": "soft",
+          "sliders": {
+            "breasts": 1,
+            "hips": 1,
+            "thighs": 1,
+            "butt": 1,
+            "body-fat": 1
+          }
+        },
+        {
+          "name": "busty",
+          "sliders": {
+            "breasts": 2,
+            "hips": 1,
+            "thighs": 1,
+            "butt": 1,
+            "body-fat": 1
+          }
+        },
+        {
+          "name": "bottom-heavy",
+          "sliders": {
+            "breasts": 1,
+            "hips": 1,
+            "thighs": 1,
+            "butt": 2,
+            "body-fat": 1,
+            "vulva": 1
+          }
+        },
+        {
+          "name": "natural skin",
+          "sliders": {
+            "breasts": 1,
+            "hips": 1,
+            "thighs": 1,
+            "butt": 1,
+            "body-fat": 1,
+            "cellulite": 1,
+            "stretch-marks": 1,
+            "pubic-hair": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♀ Thick",
+      "group": "women",
+      "variants": [
+        {
+          "name": "classic",
+          "sliders": {
+            "butt": 2,
+            "thighs": 2,
+            "hips": 2,
+            "waist": -1,
+            "vulva-puffy": 2
+          }
+        },
+        {
+          "name": "busty",
+          "sliders": {
+            "butt": 2,
+            "thighs": 2,
+            "hips": 2,
+            "waist": -1,
+            "breasts": 2
+          }
+        },
+        {
+          "name": "soft",
+          "sliders": {
+            "butt": 2,
+            "thighs": 2,
+            "hips": 2,
+            "body-fat": 1,
+            "cellulite": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♀ Plus-size",
+      "group": "women",
+      "variants": [
+        {
+          "name": "soft",
+          "sliders": {
+            "body-fat": 2,
+            "belly": 1,
+            "breasts": 2,
+            "thighs": 1,
+            "butt": 1
+          }
+        },
+        {
+          "name": "pear",
+          "sliders": {
+            "body-fat": 2,
+            "belly": 1,
+            "breasts": 1,
+            "thighs": 1,
+            "butt": 1,
+            "hips": 2
+          }
+        },
+        {
+          "name": "apple",
+          "sliders": {
+            "body-fat": 2,
+            "belly": 2,
+            "breasts": 2,
+            "thighs": 1,
+            "butt": 1
+          }
+        },
+        {
+          "name": "natural skin",
+          "sliders": {
+            "body-fat": 2,
+            "belly": 1,
+            "breasts": 2,
+            "thighs": 1,
+            "butt": 1,
+            "cellulite": 1,
+            "stretch-marks": 1,
+            "skin-realism": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♀ Natural",
+      "group": "women",
+      "variants": [
+        {
+          "name": "unshaved",
+          "sliders": {
+            "pubic-hair": 1,
+            "armpit-hair": 1,
+            "skin-realism": 1,
+            "breast-shape": 1,
+            "limb-hair": 1
+          }
+        },
+        {
+          "name": "soft",
+          "sliders": {
+            "pubic-hair": 1,
+            "armpit-hair": 1,
+            "skin-realism": 1,
+            "breast-shape": 1,
+            "body-fat": 1,
+            "cellulite": 1
+          }
+        },
+        {
+          "name": "freckled",
+          "sliders": {
+            "pubic-hair": 1,
+            "armpit-hair": 1,
+            "skin-realism": 1,
+            "breast-shape": 1,
+            "freckles": 1,
+            "moles": 1
+          }
+        },
+        {
+          "name": "hairy",
+          "sliders": {
+            "pubic-hair": 2,
+            "armpit-hair": 2,
+            "skin-realism": 1,
+            "breast-shape": 1,
+            "limb-hair": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♀ Porn star",
+      "group": "women",
+      "variants": [
+        {
+          "name": "classic",
+          "sliders": {
+            "breasts": 2,
+            "breast-shape": -2,
+            "waist": -1,
+            "butt": 1,
+            "pubic-hair": -2,
+            "armpit-hair": -2,
+            "vulva": -1
+          }
+        },
+        {
+          "name": "natural",
+          "sliders": {
+            "breasts": 1,
+            "waist": -1,
+            "butt": 1,
+            "pubic-hair": -1,
+            "armpit-hair": -2,
+            "vulva": -1
+          }
+        },
+        {
+          "name": "thick",
+          "sliders": {
+            "breasts": 2,
+            "breast-shape": -2,
+            "waist": -1,
+            "butt": 2,
+            "pubic-hair": -2,
+            "armpit-hair": -2,
+            "vulva": -1,
+            "hips": 2
+          }
+        },
+        {
+          "name": "fit",
+          "sliders": {
+            "breasts": 1,
+            "breast-shape": -2,
+            "butt": 1,
+            "pubic-hair": -2,
+            "armpit-hair": -2,
+            "vulva": -1,
+            "muscle": 1,
+            "abs": 1
+          }
+        }
+      ],
+      "profiles": {
+        "realistic": {
+          "skin-realism": -1
+        },
+        "stylized": {
+          "skin-realism": -1
+        }
+      }
+    },
+    {
+      "name": "♂ Lean",
+      "group": "men",
+      "variants": [
+        {
+          "name": "slim",
+          "sliders": {
+            "body-fat": -1,
+            "shoulders": -1,
+            "waist": -1,
+            "foreskin": 1
+          }
+        },
+        {
+          "name": "toned",
+          "sliders": {
+            "body-fat": -1,
+            "shoulders": -1,
+            "waist": -1,
+            "muscle": 1,
+            "abs": 1
+          }
+        },
+        {
+          "name": "wiry",
+          "sliders": {
+            "body-fat": -2,
+            "shoulders": -1,
+            "waist": -1,
+            "muscle": 1,
+            "v-line": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♂ Athletic",
+      "group": "men",
+      "variants": [
+        {
+          "name": "toned",
+          "sliders": {
+            "muscle": 1,
+            "shoulders": 1,
+            "abs": 1,
+            "pectorals": 1,
+            "waist": -1
+          }
+        },
+        {
+          "name": "defined",
+          "sliders": {
+            "muscle": 1,
+            "shoulders": 1,
+            "abs": 2,
+            "pectorals": 1,
+            "waist": -1,
+            "v-line": 1
+          }
+        },
+        {
+          "name": "hung",
+          "sliders": {
+            "muscle": 1,
+            "shoulders": 1,
+            "abs": 1,
+            "pectorals": 1,
+            "waist": -1,
+            "penis": 1
+          }
+        },
+        {
+          "name": "thick legs",
+          "sliders": {
+            "muscle": 1,
+            "shoulders": 1,
+            "abs": 1,
+            "pectorals": 1,
+            "waist": -1,
+            "thighs": 1,
+            "butt": 1
+          }
+        }
+      ],
+      "profiles": {
+        "realistic": {
+          "skin-realism": 1
+        },
+        "stylized": {
+          "skin-realism": 1
+        }
+      }
+    },
+    {
+      "name": "♂ Swimmer",
+      "group": "men",
+      "variants": [
+        {
+          "name": "classic",
+          "sliders": {
+            "shoulders": 2,
+            "lats": 2,
+            "waist": -1,
+            "muscle": 1,
+            "body-fat": -1,
+            "body-hair": -2
+          }
+        },
+        {
+          "name": "defined",
+          "sliders": {
+            "shoulders": 2,
+            "lats": 2,
+            "waist": -1,
+            "muscle": 1,
+            "body-fat": -1,
+            "body-hair": -2,
+            "abs": 1,
+            "v-line": 1
+          }
+        },
+        {
+          "name": "hung",
+          "sliders": {
+            "shoulders": 2,
+            "lats": 2,
+            "waist": -1,
+            "muscle": 1,
+            "body-fat": -1,
+            "body-hair": -2,
+            "penis": 1,
+            "penis-girth": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♂ Bodybuilder",
+      "group": "men",
+      "variants": [
+        {
+          "name": "classic",
+          "sliders": {
+            "muscle": 2,
+            "pectorals": 2,
+            "biceps": 2,
+            "lats": 2,
+            "abs": 2,
+            "shoulders": 2,
+            "body-hair": -2
+          }
+        },
+        {
+          "name": "off-season",
+          "sliders": {
+            "muscle": 2,
+            "pectorals": 2,
+            "biceps": 2,
+            "lats": 2,
+            "shoulders": 2,
+            "belly": 1
+          }
+        },
+        {
+          "name": "shredded",
+          "sliders": {
+            "muscle": 2,
+            "pectorals": 2,
+            "biceps": 2,
+            "lats": 2,
+            "abs": 2,
+            "shoulders": 2,
+            "body-fat": -1,
+            "v-line": 2
+          }
+        },
+        {
+          "name": "bearded",
+          "sliders": {
+            "muscle": 2,
+            "pectorals": 2,
+            "biceps": 2,
+            "lats": 2,
+            "abs": 2,
+            "shoulders": 2,
+            "facial-hair": 2
+          }
+        }
+      ]
+    },
+    {
+      "name": "♂ Powerlifter",
+      "group": "men",
+      "variants": [
+        {
+          "name": "classic",
+          "sliders": {
+            "body-fat": 1,
+            "shoulders": 2,
+            "back": 2,
+            "thighs": 2,
+            "belly": 1,
+            "biceps": 1
+          }
+        },
+        {
+          "name": "heavy",
+          "sliders": {
+            "body-fat": 2,
+            "shoulders": 2,
+            "back": 2,
+            "thighs": 2,
+            "belly": 1,
+            "biceps": 1
+          }
+        },
+        {
+          "name": "hairy",
+          "sliders": {
+            "body-fat": 1,
+            "shoulders": 2,
+            "back": 2,
+            "thighs": 2,
+            "belly": 1,
+            "biceps": 1,
+            "body-hair": 1,
+            "facial-hair": 2
+          }
+        }
+      ]
+    },
+    {
+      "name": "♂ Stocky",
+      "group": "men",
+      "variants": [
+        {
+          "name": "solid",
+          "sliders": {
+            "shoulders": 1,
+            "waist": 1,
+            "body-fat": 1,
+            "thighs": 1,
+            "masc-fem": -1
+          }
+        },
+        {
+          "name": "muscular",
+          "sliders": {
+            "shoulders": 1,
+            "waist": 1,
+            "body-fat": 1,
+            "thighs": 1,
+            "masc-fem": -1,
+            "biceps": 1,
+            "pectorals": 1
+          }
+        },
+        {
+          "name": "thick",
+          "sliders": {
+            "shoulders": 1,
+            "waist": 1,
+            "body-fat": 1,
+            "thighs": 1,
+            "masc-fem": -1,
+            "penis-girth": 1,
+            "testicles": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♂ Dad bod",
+      "group": "men",
+      "variants": [
+        {
+          "name": "soft",
+          "sliders": {
+            "body-fat": 1,
+            "belly": 1,
+            "muscle": -1,
+            "facial-hair": 1
+          }
+        },
+        {
+          "name": "hairy",
+          "sliders": {
+            "body-fat": 1,
+            "belly": 1,
+            "muscle": -1,
+            "body-hair": 1,
+            "limb-hair": 1
+          }
+        },
+        {
+          "name": "pot belly",
+          "sliders": {
+            "body-fat": 1,
+            "belly": 2,
+            "muscle": -1,
+            "scrotum": 1
+          }
+        },
+        {
+          "name": "weathered",
+          "sliders": {
+            "body-fat": 1,
+            "belly": 1,
+            "muscle": -1,
+            "wrinkles": 1,
+            "skin-realism": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♂ Bear",
+      "group": "men",
+      "variants": [
+        {
+          "name": "classic",
+          "sliders": {
+            "body-fat": 1,
+            "belly": 1,
+            "body-hair": 2,
+            "limb-hair": 1,
+            "shoulders": 1,
+            "facial-hair": 2
+          }
+        },
+        {
+          "name": "muscle bear",
+          "sliders": {
+            "body-fat": 1,
+            "belly": 1,
+            "body-hair": 2,
+            "limb-hair": 1,
+            "shoulders": 1,
+            "facial-hair": 2,
+            "biceps": 1,
+            "pectorals": 1
+          }
+        },
+        {
+          "name": "big bear",
+          "sliders": {
+            "body-fat": 2,
+            "belly": 2,
+            "body-hair": 2,
+            "limb-hair": 1,
+            "shoulders": 1,
+            "facial-hair": 2
+          }
+        },
+        {
+          "name": "hung",
+          "sliders": {
+            "body-fat": 1,
+            "belly": 1,
+            "body-hair": 2,
+            "limb-hair": 1,
+            "shoulders": 1,
+            "facial-hair": 2,
+            "penis": 1,
+            "testicles": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♂ Otter",
+      "group": "men",
+      "variants": [
+        {
+          "name": "slim",
+          "sliders": {
+            "body-fat": -1,
+            "body-hair": 1,
+            "limb-hair": 1,
+            "facial-hair": 1
+          }
+        },
+        {
+          "name": "toned",
+          "sliders": {
+            "body-fat": -1,
+            "body-hair": 1,
+            "limb-hair": 1,
+            "facial-hair": 1,
+            "muscle": 1,
+            "abs": 1
+          }
+        },
+        {
+          "name": "hairy",
+          "sliders": {
+            "body-fat": -1,
+            "body-hair": 2,
+            "limb-hair": 2,
+            "facial-hair": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♂ Chubby",
+      "group": "men",
+      "variants": [
+        {
+          "name": "soft",
+          "sliders": {
+            "body-fat": 2,
+            "belly": 1,
+            "thighs": 1,
+            "butt": 1
+          }
+        },
+        {
+          "name": "smooth",
+          "sliders": {
+            "body-fat": 2,
+            "belly": 1,
+            "thighs": 1,
+            "butt": 1,
+            "body-hair": -2,
+            "facial-hair": -2
+          }
+        },
+        {
+          "name": "hairy",
+          "sliders": {
+            "body-fat": 2,
+            "belly": 1,
+            "thighs": 1,
+            "butt": 1,
+            "body-hair": 1,
+            "facial-hair": 1
+          }
+        },
+        {
+          "name": "heavy",
+          "sliders": {
+            "body-fat": 2,
+            "belly": 2,
+            "thighs": 1,
+            "butt": 1,
+            "scrotum": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♂ Androgynous",
+      "group": "men",
+      "variants": [
+        {
+          "name": "slim",
+          "sliders": {
+            "masc-fem": 1,
+            "shoulders": -1,
+            "hips": 1,
+            "body-fat": -1,
+            "body-hair": -2,
+            "facial-hair": -2
+          }
+        },
+        {
+          "name": "soft",
+          "sliders": {
+            "masc-fem": 1,
+            "shoulders": -1,
+            "hips": 1,
+            "body-fat": -1,
+            "body-hair": -2,
+            "facial-hair": -2,
+            "butt": 1
+          }
+        },
+        {
+          "name": "toned",
+          "sliders": {
+            "masc-fem": 1,
+            "shoulders": -1,
+            "hips": 1,
+            "body-fat": -1,
+            "body-hair": -2,
+            "facial-hair": -2,
+            "muscle": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♂ Rugged",
+      "group": "men",
+      "variants": [
+        {
+          "name": "stubble",
+          "sliders": {
+            "muscle": 1,
+            "shoulders": 1,
+            "facial-hair": 1,
+            "body-hair": 1,
+            "skin-realism": 1
+          }
+        },
+        {
+          "name": "bearded",
+          "sliders": {
+            "muscle": 1,
+            "shoulders": 1,
+            "facial-hair": 2,
+            "body-hair": 1,
+            "skin-realism": 1
+          }
+        },
+        {
+          "name": "scarred",
+          "sliders": {
+            "muscle": 1,
+            "shoulders": 1,
+            "facial-hair": 2,
+            "body-hair": 1,
+            "skin-realism": 1,
+            "scars": 1
+          }
+        },
+        {
+          "name": "weathered",
+          "sliders": {
+            "muscle": 1,
+            "shoulders": 1,
+            "facial-hair": 1,
+            "body-hair": 1,
+            "skin-realism": 1,
+            "wrinkles": 1,
+            "pubic-hair": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "♂ Porn star",
+      "group": "men",
+      "variants": [
+        {
+          "name": "classic",
+          "sliders": {
+            "penis": 2,
+            "penis-girth": 1,
+            "muscle": 1,
+            "abs": 1,
+            "pubic-hair": -1,
+            "body-hair": -2
+          }
+        },
+        {
+          "name": "huge",
+          "sliders": {
+            "penis": 2,
+            "penis-girth": 2,
+            "muscle": 1,
+            "abs": 1,
+            "pubic-hair": -1,
+            "body-hair": -2,
+            "testicles": 2
+          }
+        },
+        {
+          "name": "muscle",
+          "sliders": {
+            "penis": 2,
+            "penis-girth": 1,
+            "muscle": 1,
+            "abs": 2,
+            "pubic-hair": -1,
+            "body-hair": -2,
+            "pectorals": 1,
+            "v-line": 1
+          }
+        },
+        {
+          "name": "hairy",
+          "sliders": {
+            "penis": 2,
+            "penis-girth": 1,
+            "muscle": 1,
+            "abs": 1,
+            "pubic-hair": 1,
+            "body-hair": 1,
+            "facial-hair": 1
+          }
+        }
+      ],
+      "profiles": {
+        "realistic": {
+          "skin-realism": -1
+        },
+        "stylized": {
+          "skin-realism": -1
+        }
+      }
+    }
+  ]
+}

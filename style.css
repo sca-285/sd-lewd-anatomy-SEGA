@@ -1,0 +1,473 @@
+/* Lewd Anatomy — the WebUI sidebar is narrow. One control per row, wrapping
+   labels, and a card per slider so level names never sit on top of the next
+   control. Scoped under .lewdanatomy (and the accordion ids, for themes that
+   hoist children). */
+
+.lewdanatomy,
+#txt2img_lewdanatomy_accordion,
+#img2img_lewdanatomy_accordion {
+  overflow: visible !important;
+}
+
+.bs-card {
+  border: 0 !important;
+  border-top: 1px solid var(--border-color-primary, rgba(128, 128, 128, 0.28)) !important;
+  border-radius: 0 !important;
+  padding: 6px 8px 8px !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  background: transparent;
+  min-width: 0 !important;
+}
+
+.bs-card .head {
+  white-space: normal !important;
+  line-height: 1.35 !important;
+  overflow: visible !important;
+  height: auto !important;
+  gap: 8px !important;
+}
+
+.bs-card > .block,
+.bs-card > .form,
+.bs-card .bs-slider,
+.bs-card .bs-slider .wrap {
+  overflow: visible !important;
+  min-width: 0 !important;
+}
+
+.bs-card-head {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: flex-end !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+.bs-card-head > .block,
+.bs-card-head > div:first-child {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+/* Level legend sits on its own line, under the track, full card width. */
+.bs-legend,
+.bs-legend p,
+.bs-card .info {
+  position: static !important;
+  display: block !important;
+  white-space: normal !important;
+  height: auto !important;
+  overflow: visible !important;
+  margin: 2px 0 0 !important;
+  padding: 0 !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  overflow-wrap: anywhere !important;
+  opacity: 0.78;
+}
+
+/* Who is a radio, not a dropdown. Gradio sizes a closed dropdown from an
+   input of width 0, and the sidebar's min-width:0 collapses that to a
+   hairline — which is what made Who unusable. Three fixed choices fit as
+   a button row. */
+.bs-who,
+.bs-card .bs-who,
+.bs-card .bs-who.block {
+  display: block !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  margin: 4px 0 0 !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+.bs-who .wrap,
+.bs-who fieldset,
+.bs-who .form,
+.bs-card .bs-who .wrap,
+.bs-card .bs-who fieldset {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: stretch !important;
+  gap: 4px !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.bs-who label,
+.bs-who .wrap > label,
+.bs-card .bs-who label {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 3px 4px !important;
+  border: 1px solid var(--border-color-primary, rgba(128, 128, 128, 0.45)) !important;
+  border-radius: 5px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+  font-size: 11px !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  height: auto !important;
+}
+
+.bs-who label.selected,
+.bs-who input:checked + span,
+.bs-who .wrap > label:has(input:checked) {
+  border-color: var(--primary-500, #7c5cff) !important;
+  background: rgba(124, 92, 255, 0.12) !important;
+}
+
+.bs-who input[type="radio"] {
+  position: absolute !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  pointer-events: none !important;
+}
+
+.lewdanatomy-reset {
+  flex: 0 0 32px !important;
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  margin: 0 0 2px !important;
+  padding: 0 !important;
+  align-self: flex-end !important;
+  line-height: 1 !important;
+  font-size: 16px !important;
+  overflow: hidden !important;
+}
+
+.bs-status,
+.bs-status p,
+.bs-status li {
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  line-height: 1.5 !important;
+}
+
+.bs-status {
+  margin-top: 6px !important;
+  padding-top: 4px !important;
+}
+
+.bs-status ul,
+.bs-status ol {
+  margin: 6px 0 0 !important;
+  padding-left: 1.15em !important;
+}
+
+.bs-status li {
+  margin: 2px 0 !important;
+}
+
+/* Slider tabs: one row of compact tab buttons, the active tab's cards below. */
+.bs-tabs > .tab-nav,
+.bs-tabs .tab-nav {
+  flex-wrap: wrap !important;
+  gap: 2px !important;
+  border-bottom: 1px solid var(--border-color-primary, rgba(128, 128, 128, 0.38)) !important;
+}
+
+.bs-tabs .tab-nav button {
+  min-height: 32px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+}
+
+.bs-tabs .tabitem {
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.lewdanatomy-reset-all {
+  min-height: 32px !important;
+  align-self: center !important;
+  font-size: 12px !important;
+}
+
+/* Options: one compact row of toggle chips instead of a column of checkboxes. */
+.bs-options .wrap,
+.bs-options fieldset {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 4px !important;
+}
+
+.bs-options label {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 2px 8px !important;
+  font-size: 12px !important;
+  min-height: 28px !important;
+  border-radius: 14px !important;
+}
+
+/* Guide: a <details> in the second cell of the top grid; its text opens as an opaque panel
+   over the controls below, as wide as the extension */
+.bs-head {
+  position: relative !important;
+  overflow: visible !important;
+  gap: 6px !important;
+}
+
+.bs-guide-col {
+  justify-content: flex-end !important;
+  position: static !important;
+  overflow: visible !important;
+}
+
+.bs-guide-cell {
+  position: static !important;
+  overflow: visible !important;
+}
+
+.bs-guide-pop {
+  position: static;
+}
+
+.bs-guide-pop > summary {
+  list-style: none;
+  cursor: pointer;
+  text-align: center;
+  padding: 7px 12px;
+  border-radius: var(--button-small-radius, 6px);
+  border: 1px solid var(--button-secondary-border-color, rgba(128, 128, 128, 0.35));
+  background: var(--button-secondary-background-fill, rgba(128, 128, 128, 0.15));
+  color: var(--button-secondary-text-color, inherit);
+  font-weight: 600;
+  user-select: none;
+}
+
+.bs-guide-pop > summary::-webkit-details-marker {
+  display: none;
+}
+
+.bs-guide-pop > summary::after {
+  content: " \25BE";
+}
+
+.bs-guide-pop[open] > summary::after {
+  content: " \25B4";
+}
+
+.bs-guide-body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 1000;
+  max-height: 60vh;
+  overflow-y: auto;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color-primary, rgba(128, 128, 128, 0.35));
+  background-color: #1f2023;
+  background-color: var(--background-fill-primary, #1f2023);
+  color: var(--body-text-color, inherit);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+  isolation: isolate;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.bs-guide-body p {
+  margin: 0 0 7px;
+}
+
+.bs-guide-body code {
+  font-size: 11.5px;
+}
+
+.bs-control label {
+  white-space: normal !important;
+}
+
+/* 2.0: compact grid. Cells sit close, blocks lose their extra padding, no empty holes. */
+.lewdanatomy {
+  gap: 6px !important;
+}
+
+.lewdanatomy .bs-head {
+  gap: 6px !important;
+}
+
+.lewdanatomy .bs-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  align-items: stretch !important;
+}
+
+.lewdanatomy .bs-cell {
+  gap: 0 !important;
+  min-width: 0 !important;
+}
+
+.lewdanatomy .bs-cell > .block,
+.lewdanatomy .bs-cell > .form,
+.lewdanatomy .bs-cell .block {
+  padding: 6px 8px !important;
+  margin: 0 !important;
+  height: 100%;
+}
+
+.lewdanatomy .bs-cell label > span,
+.lewdanatomy .bs-cell .head span {
+  margin-bottom: 2px !important;
+}
+
+.lewdanatomy .bs-cell input[type="number"] {
+  padding: 2px 4px !important;
+  height: 26px !important;
+}
+
+.lewdanatomy .bs-guide-col {
+  justify-content: flex-end !important;
+}
+
+.lewdanatomy .bs-options .wrap,
+.lewdanatomy .bs-control .wrap {
+  gap: 4px 6px !important;
+}
+
+.lewdanatomy .bs-options label,
+.lewdanatomy .bs-control label {
+  padding: 3px 8px !important;
+  margin: 0 !important;
+}
+
+.bs-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 2px 0 -4px 2px;
+}
+
+/* one border per cell: the component's own block is flat inside it */
+.lewdanatomy .bs-cell .block,
+.lewdanatomy .bs-line {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.lewdanatomy .bs-cell,
+.lewdanatomy .bs-line {
+  border: 1px solid var(--block-border-color, rgba(128, 128, 128, 0.28)) !important;
+  border-radius: 8px !important;
+  background: var(--block-background-fill, transparent) !important;
+}
+
+.lewdanatomy .bs-guide-col {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.lewdanatomy .bs-guide-pop > summary {
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+}
+
+.lewdanatomy .bs-line {
+  padding: 6px 8px !important;
+}
+
+.lewdanatomy .bs-line .wrap {
+  flex-wrap: wrap !important;
+}
+
+/* sliders in narrow cells: the track never runs past its cell */
+.lewdanatomy .bs-cell input[type="range"] {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.lewdanatomy .bs-cell .wrap,
+.lewdanatomy .bs-cell .slider_input_container {
+  min-width: 0 !important;
+  overflow: hidden;
+}
+
+/* Guide and Reset stacked in one cell, filling the Profile box's height */
+.lewdanatomy .bs-guide-col {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  gap: 6px !important;
+}
+
+.lewdanatomy .bs-guide-col > * {
+  width: 100% !important;
+  flex: 0 0 auto !important;
+}
+
+.lewdanatomy .bs-guide-col button {
+  width: 100% !important;
+  height: 34px !important;
+  min-height: 34px !important;
+}
+
+/* two short radio choices side by side */
+.lewdanatomy .bs-inline .wrap {
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+}
+
+.lewdanatomy .bs-guide-col > .block {
+  height: auto !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+.lewdanatomy .bs-guide-col .html-container {
+  padding: 0 !important;
+}
+
+/* Control mode and Options fill their line: the choices share the width (Forge sizes them to
+   their text, which left a hole at the end of the line) */
+.lewdanatomy .bs-line .wrap {
+  display: flex !important;
+  width: 100% !important;
+}
+
+.lewdanatomy .bs-line .wrap > label {
+  flex: 1 1 0 !important;
+  min-width: max-content !important;
+  justify-content: center !important;
+}
+
+/* a slider's note (Skin realism, Skin tone, Cum) */
+.lewdanatomy .bs-note,
+.lewdanatomy .bs-note p {
+  color: var(--color-accent, #e8a33d) !important;
+  font-style: italic;
+  opacity: 0.9;
+}
